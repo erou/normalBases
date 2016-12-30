@@ -43,7 +43,7 @@ void main() {
 	fq_t res;
 	fq_init(res, fpn);
 
-	find_normal_random(res, P, Y, fpn);
+	find_normal_random(res, P, Y, fpn, fp);
 	fq_print_pretty(res, fpn);
 	flint_printf("\n");
 
