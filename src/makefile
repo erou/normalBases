@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-I/usr/include/flint -lflint -lmpfr -lgmp -lpthread
 DEPS = main.h
-OBJ = main.o random.o is_normal.o
+OBJ = main.o random.o is_normal.o sigma_order.o
 TEST = random.o is_normal.o test.o
 
 %.o: %.c $(DEPS)

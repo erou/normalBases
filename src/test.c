@@ -24,19 +24,59 @@ void main() {
 	fq_one(one, fpn);
 	fq_gen(Y, fpn);
 
-	fmpz *t;
-	t = Y->coeffs;
+	fq_t alpha, beta, a;
+
+	fq_init(alpha, fpn);
+	fq_init(beta, fpn);
+	fq_init(a, fpn);
+
+	fq_add(a, Y, one, fpn);
+	fq_add(a, a, one, fpn);
+
+	fq_add(alpha, one, Y, fpn);
+	fq_set(beta, Y, fpn);
+
+	fq_t tmp;
+	fq_init(tmp, fp);
+
+	fmpz *calpha;
+	fmpz *cbeta;
+	fmpz *ca;
+	calpha = alpha->coeffs;
+	cbeta = beta->coeffs;
+	ca = a->coeffs;
+
+	fq_mat_t M;
+	fq_mat_init(M, 2, 3, fp);
 
 	slong i;
-	for (i = 0; i < 10; i++) {
-		fmpz_print(t+i);
-		flint_printf("\n");
+	for (i = 0; i < 2; i++) {
+		fq_set_fmpz(tmp, calpha + i, fp);
+		fq_mat_entry_set(M, i, 0, tmp, fp);
 	}
 
+	for (i = 0; i < 2; i++) {
+		fq_set_fmpz(tmp, cbeta+ i, fp);
+		fq_mat_entry_set(M, i, 1, tmp, fp);
+	}
+
+	for (i = 0; i < 2; i++) {
+		fq_set_fmpz(tmp, ca + i, fp);
+		fq_mat_entry_set(M, i, 2, tmp, fp);
+	}
+
+	fq_mat_print_pretty(M, fp);
+
+	fq_mat_rref(M, fp);
+
+	fq_mat_print_pretty(M, fp);
 
 	fmpz_clear(p);
 	fq_ctx_clear(fp);
 	fq_ctx_clear(fpn);
 	fq_clear(one, fpn);
-	fq_clear(Y, fpn);
+	fq_clear(alpha, fpn);
+	fq_clear(beta, fpn);
+	fq_clear(a, fpn);
+	fq_mat_clear(M, fpn);
 }

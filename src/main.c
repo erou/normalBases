@@ -24,34 +24,17 @@ void main() {
 	fq_one(one, fpn);
 	fq_gen(Y, fpn);
 
-	fmpz *t;
-	t = Y->coeffs;
-
-	slong i;
-	for (i = 0; i < 10; i++) {
-		fmpz_print(t+i);
-		flint_printf("\n");
-	}
-
 	fq_poly_t P;
-	fq_poly_init2(P, n+1, fpn);
+	fq_poly_init(P, fpn);
 
-	fq_poly_set_coeff(P, 0, one, fpn);
-	fq_poly_set_coeff(P, 1, one, fpn);
-	fq_poly_set_coeff(P, 4, one, fpn);
-
-	fq_t res;
-	fq_init(res, fpn);
-
-	find_normal_random(res, P, Y, fpn, fp);
-	fq_print_pretty(res, fpn);
-	flint_printf("\n");
+	flint_printf("beginning sigma\n");
+	sigma_order(P, one, fpn);
+	fq_poly_print_pretty(P, "X", fpn);
 
 	fmpz_clear(p);
 	fq_ctx_clear(fp);
 	fq_ctx_clear(fpn);
 	fq_poly_clear(P, fpn);
-	fq_clear(res, fpn);
 	fq_clear(one, fpn);
 	fq_clear(Y, fpn);
 }
