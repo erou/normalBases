@@ -23,13 +23,15 @@ void main() {
 	fq_init(Y, fpn);
 	fq_one(one, fpn);
 	fq_gen(Y, fpn);
+	fq_pow_ui(Y, Y, 3, fpn);
+	fq_add(Y, Y, one, fpn);
 
 	fq_poly_t P;
 	fq_poly_init(P, fpn);
 
-	flint_printf("beginning sigma\n");
-	sigma_order(P, one, fpn);
+	sigma_order(P, Y, fpn);
 	fq_poly_print_pretty(P, "X", fpn);
+	flint_printf("\n");
 
 	fmpz_clear(p);
 	fq_ctx_clear(fp);
