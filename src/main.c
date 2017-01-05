@@ -6,15 +6,12 @@ void main() {
 
 	fmpz_set_ui(p,2);
 
-	fq_ctx_t fp, fpn;
+	fq_ctx_t fpn;
 
-	slong d = 2;
 	slong n = 4;
 	
-	fq_ctx_init(fp, p, d, "X");
 	fq_ctx_init(fpn, p, n, "Y");
 
-	fq_ctx_print(fp);
 	fq_ctx_print(fpn);
 
 	fq_t one, Y;
@@ -23,8 +20,17 @@ void main() {
 	fq_init(Y, fpn);
 	fq_one(one, fpn);
 	fq_gen(Y, fpn);
-	fq_pow_ui(Y, Y, 3, fpn);
+	fq_pow_ui(Y, Y, 2, fpn);
 	fq_add(Y, Y, one, fpn);
+
+	fq_print_pretty(Y, fpn);
+
+	if (is_normal(Y, fpn)) {
+		flint_printf(" is normal\n");
+	}
+	else {
+		flint_printf(" is not normal\n");
+	}
 
 	fq_poly_t P;
 	fq_poly_init(P, fpn);
@@ -34,7 +40,6 @@ void main() {
 	flint_printf("\n");
 
 	fmpz_clear(p);
-	fq_ctx_clear(fp);
 	fq_ctx_clear(fpn);
 	fq_poly_clear(P, fpn);
 	fq_clear(one, fpn);
