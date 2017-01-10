@@ -1,47 +1,66 @@
+/*
+ * 	MAIN
+ *
+ * Code permitting to choose an algorithm and
+ * to specify the arguments such as the characteristic, 
+ * the degree of the extension.
+ *
+ */
+
 #include "main.h"
 
-void main() {
+// Help function
+void help(char* prog) {
+	fprintf(stderr, "Usage : %s [-p characteristic] [-d degreeOfExtension] [-a (random|Luneburg|Lenstra)]\n", prog);
+}
+
+int main(int argc, char **argv) {
+
+	// Initialisation of the variables
 	fmpz_t p;
 	fmpz_init(p);
+	slong d;
 
-	fmpz_set_ui(p,2);
-
-	fq_ctx_t fpn;
-
-	slong n = 4;
+	/* Use of the arguments :
+	 *
+	 * 	-p : the characteristic of the field
+	 * 	-s : the degree of the extension
+	 * 	-a : the algorithm wanted
+	 */
 	
-	fq_ctx_init(fpn, p, n, "Y");
+	int opt;
+	char alg = 'r';
 
-	fq_ctx_print(fpn);
+	while ((opt = getopt(argc, argv, "hp:d:a:")) != -1) {
+		switch (opt) {
+			case 'p':
+				fmpz_set_ui(p, atol(optarg));
+				break;
+			case 'd':
+				d = atol(optarg);
+				break;
+			case 'a':
+				alg = optarg[1];
+				break;
+			default:
+				help(argv[0]);
+				return 1;
+		}
+	}
 
-	fq_t one, Y;
+	if (optind > 0 && optind < argc) {
+		// Creation of the field F_{p^d}
+		fq_ctx_t field;
+		fq_ctx_init(field, p, d, "X");
 
-	fq_init(one, fpn);
-	fq_init(Y, fpn);
-	fq_one(one, fpn);
-	fq_gen(Y, fpn);
-	fq_pow_ui(Y, Y, 2, fpn);
-	fq_add(Y, Y, one, fpn);
+		printf("\t\t *****\nCurrently working with the field F_{p^d}\nrepresented as F_p[X]/(f(X))\nwhere :\n\n");
+		fq_ctx_print(field);
+		printf("\t\t *****\n");
 
-	fq_print_pretty(Y, fpn);
-
-	if (is_normal(Y, fpn)) {
-		flint_printf(" is normal\n");
+		fmpz_clear(p);
+		fq_ctx_clear(field);
 	}
 	else {
-		flint_printf(" is not normal\n");
+		help(argv[0]);
 	}
-
-	fq_poly_t P;
-	fq_poly_init(P, fpn);
-
-	sigma_order(P, Y, fpn);
-	fq_poly_print_pretty(P, "X", fpn);
-	flint_printf("\n");
-
-	fmpz_clear(p);
-	fq_ctx_clear(fpn);
-	fq_poly_clear(P, fpn);
-	fq_clear(one, fpn);
-	fq_clear(Y, fpn);
 }
