@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 	// Initialisation of the variables
 	fmpz_t p;
 	fmpz_init(p);
-	slong d;
+	slong d = 0;
 
 	/* Use of the arguments :
 	 *
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	 */
 	
 	int opt;
-	char alg = 'r';
+	char alg = 'd';
 
 	while ((opt = getopt(argc, argv, "hp:d:a:")) != -1) {
 		switch (opt) {
@@ -48,19 +48,46 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	if (optind > 0 && optind < argc) {
+	// We check that characteristic and degree were given
+	if (fmpz_cmp_ui(p,0) && (d != 0)) {
+
 		// Creation of the field F_{p^d}
 		fq_ctx_t field;
 		fq_ctx_init(field, p, d, "X");
 
+		// We print the situation
 		printf("\t\t *****\nCurrently working with the field F_{p^d}\nrepresented as F_p[X]/(f(X))\nwhere :\n\n");
 		fq_ctx_print(field);
 		printf("\t\t *****\n");
 
-		fmpz_clear(p);
+		fq_t res;
+		fq_init(res, field);
+
+		switch (alg) {
+			case 'a':
+			case 'A':
+				find_normal_random(res, field);
+				fq_print_pretty(res, field);
+				printf(" is a normal element.\n");
+				break;
+			case 'u':
+			case 'U':
+				printf("Luneburg's algorithm is not yet impremented.\n");
+				break;
+			case 'e':
+			case 'E':
+				printf("Lenstra's algorithm is not yet implemented.\n");
+				break;
+			default:
+				printf("Please specify an algorithm among random, Luneburg, Lenstra.\n");
+		}
+
+		fq_clear(res, field);
 		fq_ctx_clear(field);
 	}
 	else {
 		help(argv[0]);
 	}
+
+	fmpz_clear(p);
 }

@@ -11,14 +11,31 @@
  * and f is an irreducible polynomial over F_p, r is a
  * root of f in F_{p^n}, and f' is the derivative of f.
  *
+ * Currently we take f defining F_{p^n} and root
+ * the image of X in F_p[X]/(f).
+ *
  */
 
-void find_normal_random(fq_t res, const fq_poly_t f, const fq_t root, const fq_ctx_t F_pn) {
+void find_normal_random(fq_t res, const fq_ctx_t field) {
+
+	// We initialize root to X
+	fq_t root;
+	fq_init(root, field);
+	fq_gen(root, field);
+
+	// And we initialize f to the modulus defining the field
+	slong d = fq_ctx_degree(field);
+	fq_poly_t f;
+	fq_poly_init2(f, d + 1, field);
+
+	for (slong i = 0; i < d + 1; i++) {
+		fq_poly_set_coeff_fmpz(f, i, (field->modulus)->coeffs + i, field);
+	}
 
 	// We create f'
 	fq_poly_t fprime;
-	fq_poly_init(fprime, F_pn);
-	fq_poly_derivative(fprime, f, F_pn);
+	fq_poly_init(fprime, field);
+	fq_poly_derivative(fprime, f, field);
 
 	// We create a random state
 	flint_rand_t state;
@@ -26,49 +43,49 @@ void find_normal_random(fq_t res, const fq_poly_t f, const fq_t root, const fq_c
 
 	// We create and initialize some temporary variables and u
 	fq_t u,tmp1,tmp2;
-	fq_init(u, F_pn);
-	fq_init(tmp1, F_pn);
-	fq_init(tmp2, F_pn);
+	fq_init(u, field);
+	fq_init(tmp1, field);
+	fq_init(tmp2, field);
 
 	// We take u at random
-	fq_randtest(u, state, F_pn);
+	fq_randtest(u, state, field);
 
 	// But not equal to root, not to divise by zero
-	while (fq_equal(u, root, F_pn)) {
-		fq_randtest(u, state, F_pn);
+	while (fq_equal(u, root, field)) {
+		fq_randtest(u, state, field);
 	}
 
 	// tmp1 = g(u)
-	fq_sub(tmp1, u, root, F_pn);
-	fq_poly_evaluate_fq(tmp2, fprime, root, F_pn);
-	fq_mul(tmp1,tmp1,tmp2,F_pn);
-	fq_inv(tmp1, tmp1, F_pn);
-	fq_poly_evaluate_fq(tmp2, f, u, F_pn);
-	fq_mul(tmp1, tmp1, tmp2, F_pn);
+	fq_sub(tmp1, u, root, field);
+	fq_poly_evaluate_fq(tmp2, fprime, root, field);
+	fq_mul(tmp1,tmp1,tmp2,field);
+	fq_inv(tmp1, tmp1, field);
+	fq_poly_evaluate_fq(tmp2, f, u, field);
+	fq_mul(tmp1, tmp1, tmp2, field);
 
 	// while g(u) is not normal, we take an other u and we do the same
-	while (!(is_normal(tmp1, F_pn))) {
-		fq_randtest(u, state, F_pn);
+	while (!(is_normal(tmp1, field))) {
+		fq_randtest(u, state, field);
 
-		while (fq_equal(u, root, F_pn)) {
-			fq_randtest(u, state, F_pn);
+		while (fq_equal(u, root, field)) {
+			fq_randtest(u, state, field);
 		}
 
-		fq_sub(tmp1, u, root, F_pn);
-		fq_poly_evaluate_fq(tmp2, fprime, root, F_pn);
-		fq_mul(tmp1,tmp1,tmp2,F_pn);
-		fq_inv(tmp1, tmp1, F_pn);
-		fq_poly_evaluate_fq(tmp2, f, u, F_pn);
-		fq_mul(tmp1, tmp1, tmp2, F_pn);
+		fq_sub(tmp1, u, root, field);
+		fq_poly_evaluate_fq(tmp2, fprime, root, field);
+		fq_mul(tmp1,tmp1,tmp2,field);
+		fq_inv(tmp1, tmp1, field);
+		fq_poly_evaluate_fq(tmp2, f, u, field);
+		fq_mul(tmp1, tmp1, tmp2, field);
 	}
 
 	// Finally g(u) = tmp1 is normal, so we set res to tmp1
-	fq_set(res, tmp1, F_pn);
+	fq_set(res, tmp1, field);
 
 	// and we clear our variables
-	fq_poly_clear(fprime, F_pn);
+	fq_poly_clear(fprime, field);
 	flint_randclear(state);
-	fq_clear(u,F_pn);
-	fq_clear(tmp1,F_pn);
-	fq_clear(tmp2,F_pn);
+	fq_clear(u,field);
+	fq_clear(tmp1,field);
+	fq_clear(tmp2,field);
 }
