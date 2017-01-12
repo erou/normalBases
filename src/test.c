@@ -1,12 +1,14 @@
 #include "main.h"
 
 void main() {
-	fmpz_t p, uno;
+	fmpz_t p, uno, dos;
 	fmpz_init(p);
 	fmpz_init(uno);
+	fmpz_init(dos);
 
-	fmpz_set_ui(p,2);
+	fmpz_set_ui(p,3);
 	fmpz_set_ui(uno,1);
+	fmpz_set_ui(dos,2);
 
 	fq_ctx_t field;
 
@@ -19,15 +21,16 @@ void main() {
 	fq_poly_factor_t fac;
 	fq_poly_factor_init(fac, field);
 	
-	fq_poly_t P, Q, X;
-	fq_poly_init(X, field);
-	fq_poly_init(P, field);
-	fq_poly_init(Q, field);
-	fq_poly_gen(X, field);
-	fq_poly_pow(Q, X, 2, field);
-	fq_poly_add(P, X, Q, field);
-	fq_poly_one(Q, field);
-	fq_poly_add(Q, Q, X, field);
+	fq_poly_t P, Q;
+	fq_poly_init2(P, 5, field);
+	fq_poly_set_coeff_fmpz(P, 1, uno, field);
+	fq_poly_set_coeff_fmpz(P, 2, dos, field);
+	fq_poly_set_coeff_fmpz(P, 3, dos, field);
+	fq_poly_set_coeff_fmpz(P, 4, uno, field);
+
+	fq_poly_init2(Q, 3, field);
+	fq_poly_set_coeff_fmpz(Q, 1, dos, field);
+	fq_poly_set_coeff_fmpz(Q, 2, uno, field);
 
 	fq_poly_struct *fact;
 	fact = fac->poly;
@@ -39,6 +42,9 @@ void main() {
 	factor_refinement(fac, field);
 
 	fq_poly_factor_print_pretty(fac, "X", field);
+
+	fq_poly_struct *tab;
+	tab = (fq_poly_struct*)malloc(5*sizeof(fq_poly_struct));
 
 	fq_poly_clear(P, field);
 	fmpz_clear(p);
