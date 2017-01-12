@@ -1,5 +1,19 @@
 #include "main.h"
 
+/*
+ * 	FACTOR REFINEMENT
+ *
+ * Given a factorisation M = \prod_i f_i^d_i, compute a new
+ * factorisation M = \prod_j g_j^e_j where the g_j's are
+ * pairwise coprime.
+ *
+ * This algorithm is not exactly the factor refinement, since
+ * we do not care about the powers.
+ *
+ * Reference : Factor Refinement, Eric Bach, James Driscoll
+ * and Jeffrey Shallit. Journal of Algorithms.
+ */
+
 void factor_refinement(fq_poly_factor_t fac, const fq_ctx_t field) {
 
 	// we set some indices 
