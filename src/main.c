@@ -10,7 +10,7 @@
 #include "main.h"
 
 // Help function
-void help(char* prog) {
+void help(const char* prog) {
 	fprintf(stderr, "Usage : %s [-p characteristic] [-d degreeOfExtension] [-a (random|Luneburg|Lenstra)]\n", prog);
 }
 
@@ -72,7 +72,9 @@ int main(int argc, char **argv) {
 				break;
 			case 'u':
 			case 'U':
-				printf("Luneburg's algorithm is not yet impremented.\n");
+				luneburg(res, field);
+				fq_print_pretty(res, field);
+				printf(" is a normal element.\n");
 				break;
 			case 'e':
 			case 'E':
