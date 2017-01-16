@@ -16,18 +16,35 @@ void main() {
 	fq_t res, x;
 	fq_init(res, field);
 	fq_init(x, field);
-	fq_gen(x, field);
+	fq_one(x, field);
 
-	fq_poly_t X;
+	fq_poly_t X, P, Q;
 	fq_poly_init(X, field);
 	fq_poly_one(X, field);
 
-	frobenius_composition(x, X, x, field);
-	fq_print_pretty(x, field);
-	flint_printf("\n---------\n");
+	fq_poly_init2(P, 3, field);
+	fq_poly_init2(Q, 3, field);
 
-	luneburg(res, field);
-	fq_print_pretty(res, field);
+	for (slong i = 0; i < 3; i++) {
+		fq_poly_set_coeff(P, i, x, field);
+	}
+
+	for (slong i = 1; i < 3; i++) {
+		fq_poly_set_coeff(Q, i, x, field);
+	}
+
+	fq_poly_factor_t f,g;
+	fq_poly_factor_init(f, field);
+
+	fq_poly_factor_insert(f, P, 1, field);
+	fq_poly_factor_insert(f, Q, 1, field);
+	fq_poly_factor_print_pretty(f, "X", field);
+
+	fq_poly_factor_init(g, field);
+
+	factor_refinement(g, f, field);
+	fq_poly_factor_print_pretty(g, "X", field);
+
 	flint_printf("\n");
 
 	fq_clear(res, field);

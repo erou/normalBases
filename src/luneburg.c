@@ -23,7 +23,7 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 	fq_zero(res, field);
 
 	// We declare future indices and constants
-	slong d, i, j, n, exp, expmax, ind;
+	slong d, i, j, n, m, exp, expmax, ind;
 	d = fq_ctx_degree(field);
 
 	// We initialize some elements of the field
@@ -60,6 +60,9 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 		fq_poly_factor_insert(f, P, 1, field);
 	}
 
+	// We count the number of f_i because some f_i could be equals
+	m = f->num;
+
 	// Then we copy f, because fq_poly_remove modify its argument
 	fq_poly_factor_set(fcopy, f, field);
 
@@ -77,7 +80,7 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 		ind = 0;
 
 		// We find i(j)
-		for (i = 0; i < d; i++) {
+		for (i = 0; i < m; i++) {
 			exp = fq_poly_remove(fcopy->poly + i, g->poly + j, field);
 			if (expmax < exp) {
 				expmax = exp;
