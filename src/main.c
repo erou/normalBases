@@ -78,7 +78,9 @@ int main(int argc, char **argv) {
 				break;
 			case 'e':
 			case 'E':
-				printf("Lenstra's algorithm is not yet implemented.\n");
+				lenstra(res, field);
+				fq_print_pretty(res, field);
+				printf(" is a normal element.\n");
 				break;
 			default:
 				printf("Please specify an algorithm among random, Luneburg, Lenstra.\n");
