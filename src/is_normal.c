@@ -1,68 +1,69 @@
 #include "main.h"
 
 /*
- * Test if the element `elem` is normal in F_{p^n}/F_p. 
+ * Test if the element `elem` is normal in F_{p^d}/F_p. 
  *
- * For that purpose, we will check if Q =  X^n - 1 and
+ * For that purpose, we will check if Q =  X^d - 1 and
  * P are relatively primes. P is a polynomial that
  * depends only on `elem`.
  *
- * P = \sum_{i=0}^{n-1} elem^{p^{i-1}}X^i
+ * P = \sum_{i=0}^{d-1} elem^{p^{i-1}}X^i
  *
  */
 
-int is_normal(const fq_t elem, const fq_ctx_t F_pn) {
+int is_normal(const fq_t elem, const fq_ctx_t field) {
 
 	// We create the variables
-	fq_poly_t P,Q,gcd; 
-	slong n,i;
-	n = fq_ctx_degree(F_pn);
+	fq_poly_t P, Q, gcd; 
+	slong d, i;
+	d = fq_ctx_degree(field);
 
-	// We initialize the polynomiales, deg P = n - 1 and deg Q = n
-	fq_poly_init2(P, n, F_pn);
-	fq_poly_init2(Q, n+1, F_pn);
+	// We initialize the polynomials
+	fq_poly_init(P, field);
+	fq_poly_init(Q, field);
+	fq_poly_init(gcd, field);
 
 	// We create a variable coef belonging to F_{p^n}
 	fq_t coef;
-	fq_init(coef, F_pn);
+	fq_init(coef, field);
 
 	// coef = 1
-	fq_one(coef, F_pn);
+	fq_one(coef, field);
 
-	// We set Q to X^n
-	fq_poly_set_coeff(Q, n, coef, F_pn);
+	// We set Q to X^d
+	fq_poly_set_coeff(Q, d, coef, field);
 
 	// coef = -1
-	fq_neg(coef, coef, F_pn);
+	fq_neg(coef, coef, field);
 
 	// We set Q to X^n - 1
-	fq_poly_set_coeff(Q, 0, coef, F_pn);
+	fq_poly_set_coeff(Q, 0, coef, field);
 
 	// coef = elem
-	fq_set(coef, elem, F_pn);
+	fq_set(coef, elem, field);
 
 	// We set P to elem
-	fq_poly_set_coeff(P, 0, elem, F_pn);
+	fq_poly_set_coeff(P, 0, coef, field);
 
 
 	/* And using the Frobenius homomorphism, we set P to the polynomial
 	 described at the beginning. */
-	for (i = 1; i < n; i++) {
-		fq_frobenius(coef, coef, 1, F_pn);
-		fq_poly_set_coeff(P, i, coef, F_pn);
+	for (i = 1; i < d; i++) {
+		fq_frobenius(coef, coef, 1, field);
+		fq_poly_set_coeff(P, i, coef, field);
 	}
 
 	// We set gcd to gcd(P, Q)
-	fq_poly_init(gcd, F_pn);
-	fq_poly_gcd(gcd, P, Q, F_pn);
+	fq_poly_gcd(gcd, P, Q, field);
+
+	// We compute a nonzero value if gcd = 1
+	int b = fq_poly_is_one(gcd, field);
 
 	// We clear the variables, except gcd that is needed
-	fq_poly_clear(P, F_pn);
-	fq_poly_clear(Q, F_pn);
-	fq_clear(coef, F_pn);
+	fq_poly_clear(P, field);
+	fq_poly_clear(Q, field);
+	fq_poly_clear(gcd, field);
+	fq_clear(coef, field);
 
-	// We return true if gcd = 1
-	return fq_poly_is_one(gcd, F_pn);
-
-	fq_poly_clear(gcd, F_pn);
+	return b;
 }

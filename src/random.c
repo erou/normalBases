@@ -16,7 +16,7 @@
  *
  */
 
-void find_normal_random(fq_t res, const fq_ctx_t field) {
+void normal_random(fq_t res, const fq_ctx_t field) {
 
 	// We initialize root to X
 	fq_t root;

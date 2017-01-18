@@ -23,7 +23,7 @@
 // Functions 
 int is_normal(const fq_t, const fq_ctx_t);
 
-void find_normal_random(fq_t, const fq_ctx_t);
+void normal_random(fq_t, const fq_ctx_t);
 
 void sigma_order(fq_poly_t, const fq_t, const fq_ctx_t);
 

@@ -62,31 +62,65 @@ int main(int argc, char **argv) {
 
 		fq_t res;
 		fq_init(res, field);
+		fq_one(res, field);
+
+		// We compute P = X^d - 1
+		fq_poly_t P, ord;
+		fq_poly_init2(P, d+1, field);
+		fq_poly_set_coeff(P, d, res, field);
+		fq_neg(res, res, field);
+		fq_poly_set_coeff(P, 0, res, field);
+		fq_poly_init(ord, field);
+
+		fq_zero(res, field);	
 
 		switch (alg) {
 			case 'a':
 			case 'A':
-				find_normal_random(res, field);
+				normal_random(res, field);
+				sigma_order(ord, res, field);
+				if (is_normal(res, field)) {
+					flint_printf("is_normal : OK\n");
+				}
+				
+				fq_poly_print_pretty(ord, "Y", field);
+				flint_printf("\n");
 				fq_print_pretty(res, field);
-				printf(" is a normal element.\n");
+				flint_printf("\n");
 				break;
 			case 'u':
 			case 'U':
 				luneburg(res, field);
+				sigma_order(ord, res, field);
+				if (is_normal(res, field)) {
+					flint_printf("is_normal : OK\n");
+				}
+				
+				fq_poly_print_pretty(ord, "Y", field);
+				flint_printf("\n");
 				fq_print_pretty(res, field);
-				printf(" is a normal element.\n");
+				flint_printf("\n");
 				break;
 			case 'e':
 			case 'E':
 				lenstra(res, field);
+				sigma_order(ord, res, field);
+				if (is_normal(res, field)) {
+					flint_printf("is_normal : OK\n");
+				}
+				
+				fq_poly_print_pretty(ord, "Y", field);
+				flint_printf("\n");
 				fq_print_pretty(res, field);
-				printf(" is a normal element.\n");
+				flint_printf("\n");
 				break;
 			default:
 				printf("Please specify an algorithm among random, Luneburg, Lenstra.\n");
 		}
 
 		fq_clear(res, field);
+		fq_poly_clear(P, field);
+		fq_poly_clear(ord, field);
 		fq_ctx_clear(field);
 	}
 	else {
