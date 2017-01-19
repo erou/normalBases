@@ -14,7 +14,7 @@
  */
 
 void sigma_order(fq_poly_t res, const fq_t x, const fq_ctx_t field) {
-
+	
 	// We treat the degenerate case x = 0
 	if (fq_is_zero(x, field)) {
 		fq_poly_one(res, field);
@@ -41,7 +41,7 @@ void sigma_order(fq_poly_t res, const fq_t x, const fq_ctx_t field) {
 
 		// M is a matrix containing the coefficient of x in the
 		// polynomial basis E = 1, ... , X^(d-1)
-		for (i = 0; i < d; i++) {
+		for (i = 0; i < xcopy->length; i++) {
 			fq_set_fmpz(tmp, xcopy->coeffs + i, field);
 			fq_mat_entry_set(M, i, 0, tmp, field);
 		}
@@ -66,7 +66,7 @@ void sigma_order(fq_poly_t res, const fq_t x, const fq_ctx_t field) {
 			fq_frobenius(xcopy, xcopy, 1, field);
 
 			// And set its coefficients in E to the column k of the matrix M
-			for (i = 0; i < d; i++) {
+			for (i = 0; i < xcopy->length; i++) {
 
 				fq_set_fmpz(tmp, xcopy->coeffs + i, field);
 				fq_mat_entry_set(M, i, k, tmp, field);

@@ -28,8 +28,9 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 	fq_poly_init(quo, field);
 
 	// We use an other factor to copy res
-	fq_poly_factor_t copy;
+	fq_poly_factor_t copy, empty;
 	fq_poly_factor_init(copy, field);
+	fq_poly_factor_init(empty, field);
 
 	/* We start the while loop : if the factors are
 	 * some f_i, we check that f_i is coprime with
@@ -71,7 +72,7 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 				// and we set res to copy, which is res
 				// without f_i and f_j
 				fq_poly_factor_set(res, copy, field);				
-				fq_poly_factor_init(copy, field);
+				fq_poly_factor_set(copy, empty, field);
 				break;
 			}
 		}
@@ -88,4 +89,5 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 	fq_poly_clear(gcd, field);
 	fq_poly_clear(quo, field);
 	fq_poly_factor_clear(copy, field);
+	fq_poly_factor_clear(empty, field);
 }

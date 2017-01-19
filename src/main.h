@@ -33,6 +33,8 @@ void factor_refinement(fq_poly_factor_t, const fq_poly_factor_t, const fq_ctx_t)
 
 void frobenius_composition(fq_t, const fq_poly_t, const fq_t, const fq_ctx_t);
 
+slong highest_exp(const fq_poly_t, const fq_poly_t, const fq_ctx_t);
+
 void luneburg(fq_t, const fq_ctx_t);
 
 void lenstra(fq_t, const fq_ctx_t);

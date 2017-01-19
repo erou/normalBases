@@ -4,8 +4,8 @@ void main() {
 	fmpz_t p;
 	fmpz_init(p);
 
-	fmpz_set_ui(p, 5);
-	slong d = 6;
+	fmpz_set_ui(p, 2);
+	slong d = 4;
 	fq_ctx_t field;
 
 	fq_poly_t P;
