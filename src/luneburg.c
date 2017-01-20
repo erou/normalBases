@@ -45,6 +45,7 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 	fq_poly_init(P, field);
 	fq_poly_init(h, field);
 
+    // We create a list of polynomials
 	fq_poly_struct *F;
 	F = (fq_poly_struct*)malloc(d*sizeof(fq_poly_struct));
 
@@ -66,6 +67,11 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 	// We create the g_j
 	factor_refinement(g, f, field);
 	n = g->num;
+
+    fq_poly_factor_print_pretty(f, "Z", field);
+    flint_printf("\n\n");
+    fq_poly_factor_print_pretty(g, "Z", field);
+    flint_printf("\n\n");
 
 	/* In the loop, we compute the indice
 	 * i(j) such that e_i(j)j is maximal and we
@@ -106,4 +112,5 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 	fq_poly_clear(h, field);
 	fq_poly_factor_clear(f, field);
 	fq_poly_factor_clear(g, field);
+    free(F);
 }

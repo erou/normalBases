@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
 		// We compute P = X^d - 1
 		fq_poly_t P, ord;
-		fq_poly_init2(P, d+1, field);
+		fq_poly_init(P, field);
 		fq_poly_set_coeff(P, d, res, field);
 		fq_neg(res, res, field);
 		fq_poly_set_coeff(P, 0, res, field);
@@ -79,40 +79,29 @@ int main(int argc, char **argv) {
 			case 'A':
 				normal_random(res, field);
 				sigma_order(ord, res, field);
-				if (is_normal(res, field)) {
-					flint_printf("is_normal : OK\n");
+				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
+				    fq_print_pretty(res, field);
+				    flint_printf("\n");
 				}
 				
-				fq_poly_print_pretty(ord, "Y", field);
-				flint_printf("\n");
-				fq_print_pretty(res, field);
-				flint_printf("\n");
 				break;
 			case 'u':
 			case 'U':
 				luneburg(res, field);
 				sigma_order(ord, res, field);
-				if (is_normal(res, field)) {
-					flint_printf("is_normal : OK\n");
+				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
+				    fq_print_pretty(res, field);
+				    flint_printf("\n");
 				}
-				
-				fq_poly_print_pretty(ord, "Y", field);
-				flint_printf("\n");
-				fq_print_pretty(res, field);
-				flint_printf("\n");
 				break;
 			case 'e':
 			case 'E':
 				lenstra(res, field);
 				sigma_order(ord, res, field);
-				if (is_normal(res, field)) {
-					flint_printf("is_normal : OK\n");
+				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
+				    fq_print_pretty(res, field);
+				    flint_printf("\n");
 				}
-				
-				fq_poly_print_pretty(ord, "Y", field);
-				flint_printf("\n");
-				fq_print_pretty(res, field);
-				flint_printf("\n");
 				break;
 			default:
 				printf("Please specify an algorithm among random, Luneburg, Lenstra.\n");

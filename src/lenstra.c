@@ -10,11 +10,11 @@
  *  References : Gao's phD thesis.
  */
 
-void lenstra(fq_t res, const fq_ctx_t field){
+void lenstra(fq_t res, const fq_ctx_t field) {
 
 	// We set some indices and the degree of the extension
-	slong d, i, j, k;
-        d = fq_ctx_degree(field);
+	slong d, b, i, j, k;
+    d = fq_ctx_degree(field);
 
 	// We set some temporary variables and constants of the fields
 	fq_t theta, eta, X, tmp, tmp2;
@@ -34,8 +34,8 @@ void lenstra(fq_t res, const fq_ctx_t field){
 	fq_poly_init(ordBeta, field);
 	fq_poly_init(g, field);
 
-	// P = X^n - 1
-	fq_poly_init2(P, d+1, field);
+	// P = X^d - 1
+	fq_poly_init(P, field);
 	fq_poly_set_coeff(P, d, tmp, field); 
 	fq_neg(tmp, tmp, field);
 	fq_poly_set_coeff(P, 0, tmp, field); 
@@ -61,14 +61,14 @@ void lenstra(fq_t res, const fq_ctx_t field){
 		for (i = 0; i < d; i++) {
 			fq_pow_ui(tmp, X, i, field);
 			frobenius_composition(tmp, g, tmp, field);
-			for (j = 0; j < d; j++) {
+			for (j = 0; j < tmp->length; j++) {
 				fq_set_fmpz(tmp2, tmp->coeffs + j, field);
 				fq_mat_entry_set(M, j, i, tmp2, field);
 			}
 		}
 
 		// And the coodinates of \theta 
-		for (i = 0; i < d; i++) {
+		for (i = 0; i < theta->length; i++) {
 			fq_set_fmpz(tmp, theta->coeffs + i, field);
 			fq_mat_entry_set(M, i, d, tmp, field);
 		}
@@ -81,19 +81,16 @@ void lenstra(fq_t res, const fq_ctx_t field){
 		// (with coordinates B) of MxB=T
 		fq_zero(tmp2, field);
 
-		for (i = 0; i < d; i++) {
-			fq_pow_ui(tmp, X, i, field);
-			fq_mul(tmp, fq_mat_entry(M, i, d), tmp, field);
-			fq_add(tmp2, tmp2, tmp, field);
-		}
-
-		fq_t test;
-		fq_init(test, field);
-		frobenius_composition(test, g, tmp2, field);
-		fq_print_pretty(test, field);
-		flint_printf(" =? ");
-		fq_print_pretty(theta, field);
-		flint_printf("\n");
+        for (i = 0; i < k; i++) {
+            for (j = i; j < d; j++) {
+                if (!fq_is_zero(fq_mat_entry(M, i, j), field)) {
+			        fq_pow_ui(tmp, X, j, field);
+			        fq_mul(tmp, fq_mat_entry(M, i, d), tmp, field);
+			        fq_add(tmp2, tmp2, tmp, field);
+                    break;
+                }
+            }
+        }
 
 		// We compute Ord_\beta
 		sigma_order(ordBeta, tmp2, field);
@@ -109,20 +106,40 @@ void lenstra(fq_t res, const fq_ctx_t field){
 			}
 
 		else {
-			for (i = 0; i < k; i++) {
-				fq_pow_ui(tmp, X, i, field);
-				fq_neg(tmp2, fq_mat_entry(M, i, d-1), field);
-				fq_mul(tmp, tmp, tmp2, field);
-				fq_add(eta, eta, tmp, field);
-			}
+            b = 1;
 
-			if (k < d) {
-			fq_pow_ui(tmp, X, d-1, field);
-				fq_add(eta, eta, tmp, field);
-			}
-			fq_add(theta, theta, eta, field);
+            for (i = 0; i < k; i++) {
+                if (fq_is_zero(fq_mat_entry(M, i, i), field)) {
+				    fq_pow_ui(eta, X, i, field);
+                    b = 0;
+                    break;
+                }
+            }
+
+
+            if (b) {
+	    		for (i = 0; i < k; i++) {
+		    		fq_pow_ui(tmp, X, i, field);
+			    	fq_neg(tmp2, fq_mat_entry(M, i, d-1), field);
+				    fq_mul(tmp, tmp, tmp2, field);
+    				fq_add(eta, eta, tmp, field);
+	    		}
+    
+	    		if (k < d) {
+		    	    fq_pow_ui(tmp, X, d-1, field);
+			    	fq_add(eta, eta, tmp, field);
+    			}
+
+            }
+
+	    	fq_add(theta, theta, eta, field);
+            fq_zero(eta, field);
 		}
+
+        fq_mat_zero(M, field);
+        sigma_order(ordTheta, theta, field);
 	}
+
 	fq_set(res, theta, field);
 
 	// We clear all the variables
