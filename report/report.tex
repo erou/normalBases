@@ -1,0 +1,152 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsthm,amsopn}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+%\usepackage{tikz}
+%\usepackage{array}
+%\usepackage[top=1cm,bottom=1cm]{geometry}
+%\usepackage{listings}
+%\usepackage{xcolor}
+
+% fancy headers and footers
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\fancyhead[L]{BCPST 2 - Lycée Jacques Prévert}
+%\fancyhead[R]{Rappels d'analyse}
+%\pagenumbering{gobble} % no page numbering
+
+% Création des labels Théorème, Lemme, etc...
+
+\newtheoremstyle{break}%
+{}{}%
+{\itshape}{}%
+{\bfseries}{}%  % Note that final punctuation is omitted.
+{\newline}{}
+
+\newtheoremstyle{sc}%
+{}{}%
+{}{}%
+{\scshape}{}%  % Note that final punctuation is omitted.
+{\newline}{}
+
+\theoremstyle{break}
+\newtheorem{thm}{Théorème}[section]
+\newtheorem{lm}[thm]{Lemme}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollaire}
+
+\theoremstyle{sc}
+\newtheorem{exo}{Exercice}
+
+\theoremstyle{definition}
+\newtheorem{defi}[thm]{Définition}
+\newtheorem{ex}[thm]{Exemple}
+
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remarque}
+
+% Raccourcis pour les opérateurs mathématiques (les espaces avant-après sont modifiés pour mieux rentrer dans les codes mathématiques usuels)
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Img}{Im}
+\DeclareMathOperator{\Card}{Card}
+\DeclareMathOperator{\Vect}{Vect}
+
+
+% Nouvelles commandes
+\newcommand{\ps}[2]{\left\langle#1,#2\right\rangle}
+\newcommand{\ent}[2]{[\![#1,#2]\!]}
+\newcommand{\diff}{\mathop{}\!\mathrm{d}}
+\newcommand{\ie}{\emph{i.e. }}
+
+% opening
+\title{Normal bases generation in C}
+\author{Édouard \textsc{Rousseau}\\Supervised by Michaël \textsc{Quisquater}}
+
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  This is the report of a C project about the generation of normal elements in
+  finite fields. Consider a field extension $\mathbb{F}_{p^d}/\mathbb{F}_p$, we
+  say that $\alpha\in\mathbb{F}_{p^d}$ is normal if $\left\{
+  \alpha,\alpha^p,\alpha^{p^2},\cdots,\alpha^{p^{d-1}} \right\}$ is a basis of
+  $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. We first give some theory to
+  characterize normal elements, then we describe three algorithms to compute
+  normal elements : a randomized algorithm, Lüneburg's algorithm, and
+  Lenstra's algorithm. Finally, we give experimental results about our
+  implementation. All this work is based on Gao's PhD thesis~\cite{Ga93}.
+
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+\section{Introduction}
+\subsection{Normal bases}
+\subsection{Recalls and notations}
+In all the text, we will note $\mathbb{F}_n$ the field with $n$ elements. We
+recall that $n$ must be a \emph{prime power} (\ie $n=p^d$ where $p$ is a prime
+number and $d$ is a positive number). We have
+$\mathbb{F}_{p^d}\cong\mathbb{F}_p[X]/(P)$, where $P$ is an irreducible
+polynomial of degree $d$ in $\mathbb{F}_p[X]$, and this is the representation
+that will be used in the C code. In the following, we will note
+$X$ both for the indeterminate $X$ and for its image $\bar X$ in the
+quotient $\mathbb{F}_p[X]/(P)$. $\mathbb{F}_{p^d}$ is a vector space over
+$\mathbb{F}_p$, of dimension $d$, the basis $\left\{ 1, X, X^2, \dots, 
+X^{d-1} \right\}$ will be called the \emph{polynomial basis}. We also recall
+that $\mathbb{F}_{p^d}$ is a \emph{field extension} of $\mathbb{F}_p$ and the
+characteristic of $\mathbb{F}_{p^d}$ is $p$. Lastly, we denote by $\sigma$ the
+\emph{Frobenius map}, defined by $\sigma(x)=x^p$ for all
+$x\in\mathbb{F}_{p^d}$. This map is a $\mathbb{F}_p$-automorphism of
+$\mathbb{F}_{p^d}$ (\ie $\sigma$ is a field morphism, a bijection, and $\forall
+y\in\mathbb{F}_p,\;\sigma(y)=y$), as a consequence, $\sigma$ is also a linear
+map.
+
+All these recalls being made, we can begin our journey. Note that we look only
+at \emph{prime extensions}, (\ie extensions of type
+$\mathbb{F}_{p^d}/\mathbb{F}_p$). This choice has been made because the theory
+of normal elements in extensions of type $\mathbb{F}_{q^n}/\mathbb{F}_q$ is not
+different (replacing $p$ by $q$ in the following demontrations would be
+sufficient), but the implementation of the algorithms is simpler in the case of
+prime extensions.
+
+\section{Basics on normal bases}
+
+In all this section, we set $p$ a prime number and $d$ a positive number. We
+work with the extension $\mathbb{F}_{p^d}/\mathbb{F}_p$ and the Frobenius
+morphism $\sigma$ defined above.
+
+\begin{defi}[normal element, normal basis]
+  Let $\alpha\in\mathbb{F}_{p^d}$, we say that $\alpha$ is a \emph{normal
+  element} if $\left\{ \alpha, \sigma(\alpha),\dots,\sigma^{d-1}(\alpha)
+  \right\}=\left\{ \alpha, \alpha^{p}, \dots, \alpha^{p^{d-1}} \right\}$ is a
+  basis of $\mathbb{F}_{p^d}$. Such a basis is called a \emph{normal basis}. 
+\end{defi}
+
+In order to recognize a normal element $\alpha$, we can compute the dimension of the
+linear span of $\left\{ \sigma^i(\alpha) \;|\; 0\leq i < k \right\}$. A way of
+doing that is to construct the matrix $M$ which columns are the coordinates of the
+elements $\sigma^i(\alpha)$ in the polynomial basis, and to check if $M$ is
+non-singular. This can be done using Gauss algorithm. This method is not
+efficient so we will work on other characterizations of normal elements.
+
+
+
+\section{Computation of normal bases}
+
+\section{Experimental results}
+
+\clearpage
+\bibliographystyle{unsrt}
+\bibliography{biblio}
+\end{document}
