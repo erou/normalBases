@@ -2,7 +2,7 @@
 
 /* 	FROBENIUS COMPOSITION
  *
- *  Compute h(f)(x) where f is the frobenius map,
+ *  Compute h(σ)(x) where σ is the frobenius map,
  *  h = \sum h_i X^i is a polynomial, and x is 
  *  an element of the field.
  */
@@ -22,7 +22,7 @@ void frobenius_composition(fq_t res, const fq_poly_t h, const fq_t x, const fq_c
 	fq_mul(tmp, h->coeffs, xcopy, field);
 	fq_add(res, res, tmp, field);
 
-	// and we add h_i(f^i(x)) to res (for i = 1 to i = degree(h))
+	// and we add h_i(σ^i(x)) to res (for i = 1 to i = degree(h))
 	for (slong i = 1; i < h->length; i++) {
 		fq_frobenius(xcopy, xcopy, 1, field);
 		fq_mul(tmp, h->coeffs + i, xcopy, field);

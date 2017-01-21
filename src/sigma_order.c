@@ -4,10 +4,10 @@
  * Compute the sigma order of x in F_{p^n} / F_p 
  *
  * The sigma order of x is a polynomial X^k - \sum_{i=0}^{k-1} c_i X^i
- * where k is the least positive integer such that f^k(x) belongs
- * to the F_p linear span of {f^0(x), f^1(x), ... , f^{k-1}(x)}, f is the
+ * where k is the least positive integer such that σ^k(x) belongs
+ * to the F_p linear span of {σ^0(x), σ^1(x), ... , σ^{k-1}(x)}, σ is the
  * frobenius homomorphism, and the c_i's are the coefficient such that
- * f^k(x) = \sum c_i f^i(x).
+ * σ^k(x) = \sum c_i σ^i(x).
  *
  * References ::
  * - Gao's PhD thesis (3.2)
@@ -62,7 +62,7 @@ void sigma_order(fq_poly_t res, const fq_t x, const fq_ctx_t field) {
 			// We copy M into Mcopy
 			fq_mat_set(Mcopy, M, field);
 
-			// We compute f^k(x)
+			// We compute σ^k(x)
 			fq_frobenius(xcopy, xcopy, 1, field);
 
 			// And set its coefficients in E to the column k of the matrix M

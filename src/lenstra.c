@@ -17,9 +17,9 @@ void lenstra(fq_t res, const fq_ctx_t field) {
     d = fq_ctx_degree(field);
 
 	// We set some temporary variables and constants of the fields
-	fq_t theta, eta, X, tmp, tmp2;
+	fq_t theta, zeta, X, tmp, tmp2;
 	fq_init(theta, field);
-	fq_init(eta, field);
+	fq_init(zeta, field);
 	fq_init(tmp, field);
 	fq_init(tmp2, field);
 	fq_init(X, field);
@@ -40,9 +40,9 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 	fq_neg(tmp, tmp, field);
 	fq_poly_set_coeff(P, 0, tmp, field); 
 
-	/* We finally set an n x (n+1) matrix M, M will be
+	/* We finally set an n × (n+1) matrix M, M will be
 	 * the concatenation of the matrix of the linear map
-	 * g(f), where f is the frobenius map, and of the 
+	 * g(σ), where σ is the frobenius map, and of the 
 	 * coordinates of theta in the basis 1, ..., X^(d-1)
 	 */
 	fq_mat_t M;
@@ -54,10 +54,10 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 	// so the algorithm stops
 	while (!fq_poly_equal(ordTheta, P, field)) {
 
-		// g = (X^d - 1) / Ord_\theta
+		// g = (X^d - 1) / Ord_θ
 		fq_poly_divides(g, P, ordTheta, field);
 
-		// We compute the matrix of g(f)
+		// We compute the matrix of g(σ)
 		for (i = 0; i < d; i++) {
 			fq_pow_ui(tmp, X, i, field);
 			frobenius_composition(tmp, g, tmp, field);
@@ -67,18 +67,18 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 			}
 		}
 
-		// And the coodinates of \theta 
+		// And the coodinates of θ
 		for (i = 0; i < theta->length; i++) {
 			fq_set_fmpz(tmp, theta->coeffs + i, field);
 			fq_mat_entry_set(M, i, d, tmp, field);
 		}
 
-		// We solve MxB=T with unknown B, where T represents 
-		// the coordinates of \theta, 
+		// We solve M×B=T with unknown B, where T represents 
+		// the coordinates of θ, 
 		k = fq_mat_rref(M, field);
 
-		// We set tmp2 to the solution \beta
-		// (with coordinates B) of MxB=T
+		// We set tmp2 to the solution β
+		// (with coordinates B) of M×B=T
 		fq_zero(tmp2, field);
 
         for (i = 0; i < k; i++) {
@@ -92,14 +92,14 @@ void lenstra(fq_t res, const fq_ctx_t field) {
             }
         }
 
-		// We compute Ord_\beta
+		// We compute Ord_β
 		sigma_order(ordBeta, tmp2, field);
 
 		/* If the degree of ordTheta is higher than the degree
 		 * of ordBeta, we change beta for theta = tmp2 and we
 		 * continue in the while loop. If not, we look for an 
-		 * element \eta such that g(f)(\eta) = 0 and we set
-		 * \beta to \theta + \eta.
+		 * element ζ such that g(σ)(ζ) = 0 and we set
+		 * β to θ + ζ.
 		 */
 		if (ordTheta->length < ordBeta->length) {
 				fq_set(theta, tmp2, field);
@@ -110,7 +110,7 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 
             for (i = 0; i < k; i++) {
                 if (fq_is_zero(fq_mat_entry(M, i, i), field)) {
-				    fq_pow_ui(eta, X, i, field);
+				    fq_pow_ui(zeta, X, i, field);
                     b = 0;
                     break;
                 }
@@ -122,18 +122,18 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 		    		fq_pow_ui(tmp, X, i, field);
 			    	fq_neg(tmp2, fq_mat_entry(M, i, d-1), field);
 				    fq_mul(tmp, tmp, tmp2, field);
-    				fq_add(eta, eta, tmp, field);
+    				fq_add(zeta, zeta, tmp, field);
 	    		}
     
 	    		if (k < d) {
 		    	    fq_pow_ui(tmp, X, d-1, field);
-			    	fq_add(eta, eta, tmp, field);
+			    	fq_add(zeta, zeta, tmp, field);
     			}
 
             }
 
-	    	fq_add(theta, theta, eta, field);
-            fq_zero(eta, field);
+	    	fq_add(theta, theta, zeta, field);
+            fq_zero(zeta, field);
 		}
 
         fq_mat_zero(M, field);
@@ -144,7 +144,7 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 
 	// We clear all the variables
 	fq_clear(theta, field);
-	fq_clear(eta, field);
+	fq_clear(zeta, field);
 	fq_clear(X, field);
 	fq_clear(tmp, field);
 	fq_clear(tmp2, field);

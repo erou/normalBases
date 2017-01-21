@@ -1,13 +1,13 @@
 #include "main.h"
 
 /*
- * Test if the element `elem` is normal in F_{p^d}/F_p. 
+ * Test if the element α is normal in F_{p^d}/F_p. 
  *
  * For that purpose, we will check if Q =  X^d - 1 and
  * P are relatively primes. P is a polynomial that
- * depends only on `elem`.
+ * depends only on α.
  *
- * P = \sum_{i=0}^{d-1} elem^{p^{i-1}}X^i
+ * P = \sum_{i=0}^{d-1} α^{p^{i-1}}X^i
  *
  */
 
@@ -39,10 +39,10 @@ int is_normal(const fq_t elem, const fq_ctx_t field) {
 	// We set Q to X^n - 1
 	fq_poly_set_coeff(Q, 0, coef, field);
 
-	// coef = elem
+	// coef = α
 	fq_set(coef, elem, field);
 
-	// We set P to elem
+	// We set P to α
 	fq_poly_set_coeff(P, 0, coef, field);
 
 

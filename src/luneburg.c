@@ -5,14 +5,14 @@
  *  This algorithm is deterministic.
  *
  *  We first compute the sigma order polynomials f_i of
- *  alpha^i (i = 0 .. d-1) where alpha is a generator of 
+ *  α^i (i = 0 .. d-1) where alpha is a generator of 
  *  the field F_{p^d}. Then we apply factor refinement to
  *  the f_i's, to obtain polynomials g_j (j = 1 .. r) pairwise
  *  coprimes, and such that for each i, we have
  *  f_i = \prod g_j^e_ij. Then for each j, we find i(j) such that
  *  e_i(j)j is maximal, and we compute h_j = f_i(j) / g_j^e_i(j)j
- *  and beta_j = h_j(f)(alpha^i(j)) (where f is the frobenius map).
- *  Then beta = \sum beta_j is a normal element.
+ *  and β_j = h_j(σ)(α^i(j)) (where σ is the frobenius map).
+ *  Then β = \sum β_j is a normal element.
  *
  *  References : Gao's PhD thesis.
  */
@@ -75,7 +75,7 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 
 	/* In the loop, we compute the indice
 	 * i(j) such that e_i(j)j is maximal and we
-	 * add beta_j to rop
+	 * add β_j to rop
 	 */
 	for (j = 0; j < n; j++) {
 		exp = 0;
@@ -91,7 +91,7 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 			}
 		}
 
-		// And we compute beta_j
+		// And we compute β_j 
 		fq_poly_pow(P, g->poly + j, expmax, field);
 		fq_poly_divides(h, F + ind, P, field);
 		fq_pow_ui(tmp, X, ind, field);
