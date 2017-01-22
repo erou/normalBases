@@ -1,3 +1,6 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%        REPORT OF THE PROJECT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -35,20 +38,20 @@
 {\newline}{}
 
 \theoremstyle{break}
-\newtheorem{thm}{Théorème}[section]
-\newtheorem{lm}[thm]{Lemme}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lm}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
-\newtheorem{cor}[thm]{Corollaire}
+\newtheorem{cor}[thm]{Corollary}
 
 \theoremstyle{sc}
 \newtheorem{exo}{Exercice}
 
 \theoremstyle{definition}
-\newtheorem{defi}[thm]{Définition}
-\newtheorem{ex}[thm]{Exemple}
+\newtheorem{defi}[thm]{Definition}
+\newtheorem{ex}[thm]{Example}
 
 \theoremstyle{remark}
-\newtheorem{rem}[thm]{Remarque}
+\newtheorem{rem}[thm]{Remark}
 
 % Raccourcis pour les opérateurs mathématiques (les espaces avant-après sont modifiés pour mieux rentrer dans les codes mathématiques usuels)
 \DeclareMathOperator{\Ker}{Ker}
@@ -56,6 +59,7 @@
 \DeclareMathOperator{\Img}{Im}
 \DeclareMathOperator{\Card}{Card}
 \DeclareMathOperator{\Vect}{Vect}
+\DeclareMathOperator{\Tr}{Tr}
 
 
 % Nouvelles commandes
@@ -94,16 +98,16 @@
 \section{Introduction}
 \subsection{Normal bases}
 \subsection{Recalls and notations}
-In all the text, we will note $\mathbb{F}_n$ the field with $n$ elements. We
+In all the text, we denote by $\mathbb{F}_n$ the field with $n$ elements. We
 recall that $n$ must be a \emph{prime power} (\ie $n=p^d$ where $p$ is a prime
 number and $d$ is a positive number). We have
 $\mathbb{F}_{p^d}\cong\mathbb{F}_p[X]/(P)$, where $P$ is an irreducible
 polynomial of degree $d$ in $\mathbb{F}_p[X]$, and this is the representation
-that will be used in the C code. In the following, we will note
+that will be used in the C code. From now, we note
 $X$ both for the indeterminate $X$ and for its image $\bar X$ in the
 quotient $\mathbb{F}_p[X]/(P)$. $\mathbb{F}_{p^d}$ is a vector space over
 $\mathbb{F}_p$, of dimension $d$, the basis $\left\{ 1, X, X^2, \dots, 
-X^{d-1} \right\}$ will be called the \emph{polynomial basis}. We also recall
+X^{d-1} \right\}$ is called the \emph{polynomial basis} in the following. We also recall
 that $\mathbb{F}_{p^d}$ is a \emph{field extension} of $\mathbb{F}_p$ and the
 characteristic of $\mathbb{F}_{p^d}$ is $p$. Lastly, we denote by $\sigma$ the
 \emph{Frobenius map}, defined by $\sigma(x)=x^p$ for all
@@ -124,7 +128,8 @@ prime extensions.
 
 In all this section, we set $p$ a prime number and $d$ a positive number. We
 work with the extension $\mathbb{F}_{p^d}/\mathbb{F}_p$ and the Frobenius
-morphism $\sigma$ defined above.
+morphism $\sigma$ defined above. We are now able to give a formal definition
+of a normal element and a normal basis.
 
 \begin{defi}[normal element, normal basis]
   Let $\alpha\in\mathbb{F}_{p^d}$, we say that $\alpha$ is a \emph{normal
@@ -138,9 +143,211 @@ linear span of $\left\{ \sigma^i(\alpha) \;|\; 0\leq i < k \right\}$. A way of
 doing that is to construct the matrix $M$ which columns are the coordinates of the
 elements $\sigma^i(\alpha)$ in the polynomial basis, and to check if $M$ is
 non-singular. This can be done using Gauss algorithm. This method is not
-efficient so we will work on other characterizations of normal elements.
+efficient so we work on other characterizations of normal elements. We need
+two more definitions to be able to state our results.
 
+\begin{defi}[trace function]
+  The \emph{trace function}
+  $\Tr_{p^d|p}:\mathbb{F}_{p^d}\to\mathbb{F}_p$ of the extension
+$\mathbb{F}_{p^d}/\mathbb{F}_p$ is the function defined by
+\[
+  \Tr_{p^d|p}(\alpha) = \sum_{i=0}^{d-1}\alpha^{p^i}.
+\]
+It takes its values in $\mathbb{F}_p$ since $(\Tr_{p^d|p}(\alpha))^p
+= \Tr_{p^d|p}(\alpha)$. 
+\end{defi}
 
+The trace is a tool that permit to know when a family of elements $\alpha_1,
+\dots, \alpha_d$ forms a basis of $\mathbb{F}_{p^d}$ over
+$\mathbb{F}_p$, using the discrinant of these elements.
+
+\begin{defi}[discriminant]
+  Let $\alpha_1, \dots, \alpha_d$ be elements in $\mathbb{F}_{p^d}$, the
+  \emph{discriminant} $\Delta(\alpha_1, \dots, \alpha_d)$ of these elements
+  is the determinant
+  \[
+    \Delta(\alpha_1, \dots, \alpha_d)=\det
+    \begin{pmatrix}
+      \Tr(\alpha_1\alpha_1) & \Tr(\alpha_1\alpha_2) & \dots &
+      \Tr(\alpha_1\alpha_d) \\
+      \Tr(\alpha_2\alpha_1) & \Tr(\alpha_2\alpha_2) & \dots &
+      \Tr(\alpha_2\alpha_d) \\
+      \vdots & \vdots & & \vdots \\
+      \Tr(\alpha_d\alpha_1) & \Tr(\alpha_d\alpha_2) & \dots &
+      \Tr(\alpha_d\alpha_d)
+    \end{pmatrix}
+  \]
+  where $\Tr$ is the same trace as before. We ommit the indices because
+  the extension is always the same.
+\end{defi}
+
+With this last tool, we can state our first theorem.
+
+\begin{thm}[Theorem 2.2.1, \cite{Ga93}]
+  For any $n$ elements $\alpha_1, \dots, \alpha_d$ in
+  $\mathbb{F}_{p^d}$, they form a basis of $\mathbb{F}_{p^d}$ over
+  $\mathbb{F}_p$ if and only if $\Delta(\alpha_1, \dots,
+  \alpha_d)\neq0$.
+\end{thm}
+
+\begin{proof}
+  First assume that $\alpha_1, \dots, \alpha_d$ form a basis of
+  $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. We prove that
+  $\Delta(\alpha_1, \dots, \alpha_d)\neq0$ by showing that the row vectors
+  $L_1, \dots, L_d$ of
+  the matrix in the definition of $\Delta(\alpha_1, \dots, \alpha_d)$ are
+  linearly independent over $\mathbb{F}_p$, and thus the matrix is
+  nonsingular. Suppose that there exists $c_1, \dots,
+  c_d\in\mathbb{F}_p$ with $\sum_i c_iL_i = 0$, it means
+  \[
+    c_1\Tr(\alpha_1\alpha_j) + \dots + c_n\Tr(\alpha_d\alpha_j) =
+    0\textrm{ for }1\leq j\leq d.
+  \]
+  Then with $\beta=c_1\alpha_1 + \dots + c_d\alpha_d$, by linearity of the
+  trace function, we get $\Tr(\beta\alpha_j) = 0$ for $1\leq j\leq d$. Since
+  $\alpha_1, \dots, \alpha_d$ is a basis of $\mathbb{F}_{p^d}$, it follows
+  that $\Tr(\beta\alpha) = 0$ for all $\alpha\in\mathbb{F}_{p^d}$. If
+  $\beta\neq0$, it means that $\Tr(\gamma)=0$ for all
+  $\gamma\in\mathbb{F}_{p^d}$ : we can see that this is impossible by thinking
+  of $\Tr(\gamma)$ as the trace of the multiplication-by-$\gamma$ linear map. So we have $\beta=0$, and then
+  $c_1\alpha_1 + \dots + c_d\alpha_d = 0$ implies $c_1=\dots=c_d=0$.
+
+  Conversely, assume that $\Delta(\alpha_1, \dots, \alpha_d)\neq0$ and
+  $c_1\alpha_1+\dots+c_d\alpha_d=0$ for some $c_1, \dots,
+  c_d\in\mathbb{F}_p$. By multiplying by $\alpha_j$, we have
+  \[
+    c_1\alpha_1\alpha_j+\dots+c_d\alpha_d\alpha_j\textrm{ for }1\leq j \leq d,
+  \]
+  and by applying the trace function, we get
+  \[
+    c_1\Tr(\alpha_1\alpha_j)+\dots+c_n\Tr(\alpha_d\alpha_j)\textrm{ for }1\leq
+    j\leq d.
+  \]
+  But this is the same as $\sum c_iL_i=0$ where the $L_i$ are the rows of the
+  matrix in $\Delta(\alpha_1, \dots, \alpha_d)$. Since this matrix is
+  nonsingular by hypothesis, its rows are linearly independent and it follow
+  that $c_1=\dots=c_d$. Therefore $\alpha_1, \dots, \alpha_d$ are linearly
+  independant over $\mathbb{F}_p$, and form a family of $d$ vectors in a
+  $d$-dimensionnal vector space, so $\alpha_1, \dots, \alpha_d$ form  basis of
+  $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$.
+\end{proof}
+
+This characterization is interesting in itself, but the matrix defined in
+$\Delta(\alpha_1, \dots, \alpha_d)$ is quite complicated. Fortunately,
+we can use a much simpler matrix.
+
+\begin{cor}
+  \label{circulantCor}
+ The elements $\alpha_1, \dots, \alpha_d$ form a basis of
+ $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$ if and only if the matrix $A$ is
+ nonsigular, where
+ \[
+   A = 
+   \begin{pmatrix}
+     \alpha_1 & \alpha_2 & \dots & \alpha_d \\
+     \alpha_1^p & \alpha_2^p & \dots & \alpha_d^p \\
+     \vdots & \vdots & & \vdots \\
+     \alpha_1^{p^{d-1}} & \alpha_2^{p^{d-1}} & \dots &
+     \alpha_d^{p^{d-1}}.
+   \end{pmatrix}
+ \]
+\end{cor}
+\begin{proof}
+  We have $\Delta(\alpha_1, \dots, \alpha_d)=\det(A^tA)=(\det A)^2$.   
+\end{proof}
+
+We now have a simpler matrix to study, but it is still a matrix, so the nature
+of the problem is the same as before. Next lemma allow us to change the nature
+of the problem, by working with polynomials.
+
+\begin{lm}
+  \label{henselLm}
+  For any $n$ elements $a_0, a_1, \dots, a_{d-1}\in\mathbb{F}_{p^d}$, the
+  $d\times d$ circulant matrix
+  \[
+    c[a_0, a_1, \dots, a_{d-1}] =
+    \begin{pmatrix}
+      a_0 & a_1 & a_2 & \dots & a_{d-1} \\
+      a_{d-1} & a_0 & a_1 & \dots & a_{d-2} \\
+      a_{d-2} & a_{d-1} & a_0 & \dots & a_{d-3} \\
+      \vdots & \vdots & \vdots & & \vdots \\
+      a_1 & a_2 & a_3 & \dots & a_0
+    \end{pmatrix}
+  \]
+  is nonsigular if and only if the polynomial $\sum a_iX^i$ is relatively
+  prime to $X^d-1$.
+\end{lm}
+\begin{proof}
+  Let $A$ be the following $d\times d$ permutation matrix 
+  \[
+    \begin{pmatrix}
+      0 & 1 & 0 & \dots & 0 & 0 \\
+      0 & 0 & 1 & \dots & 0 & 0 \\
+      \vdots & \vdots & \vdots & & \vdots & \vdots \\
+      0 & 0 & 0 & \dots & 0 & 1 \\
+      1 & 0 & 0 & \dots & 0 & 0
+    \end{pmatrix}.
+  \]
+  Then we see that $c[a_0, a_1, \dots, a_{d-1}] =
+  \sum_{i=0}^{d-1}a_iA^i=f(A)$, where $f(X)=\sum_{i=0}^{d-1}a_iX^i$. On the
+  first line of $A^i$, there is only one nonzero value, it is a $1$ in
+  position $i+1$. Hence the matrices $A^0, A, \dots, A^{d-1}$, are linearly
+  independant, and since $A^d=I_d$, we know that the minimal polynomial
+  of $A$ is $X^d-1$. Assume that $f(X)$ is relatively prime to $X^d-1$. Then
+  there are polynomials $a(X), b(X)$ such that
+  \[ 
+  a(X)f(X) + b(X)(X^d-1)=1,
+\]
+and so
+\[
+  a(A)f(A) = I_d,
+\]
+as $A^d-I_d=0$. This implies that $f(A)$ is invertible and so
+nonsigular. Now assume that $f(X)$ and $X^d-1$ are not relatively prime, and
+note $d(X)\neq1$ their gcd. Let $f(X)=f_1(X)d(X)$ and $X^d-1=h(X)d(X)$.
+Since $\deg h < n$, we have $h(A)\neq0$. But $h(A)d(A)=0$, so we see that
+$d(A)$ is singular. Therefore $f(A)=f_1(A)d(A)$ is also singular. We have shown
+that $f(A)$ is singular if and only if $f(X)$ is relatively prime to $X^d-1$.
+\end{proof}
+
+We are now able to state the last result oh this section.
+
+\begin{thm}[Hensel, 1888]
+  \label{hensel}
+  Let $\alpha\in\mathbb{F}_{p^d}$, $\alpha$ is a normal element of the
+  extension $\mathbb{F}_{p^d}/\mathbb{F}_p$ if and only if the polynomial
+  $\alpha^{p^{d-1}}X^{d-1}+\dots+\alpha^pX+\alpha\in\mathbb{F}_{p^d}[X]$ 
+  is relatively prime to $X^d-1$.
+\end{thm}
+\begin{proof}
+  $\alpha$ is a normal element, if, by definition, the elements $\alpha,
+  \alpha^p, \dots, \alpha^{p^{d-1}}$ form a basis of
+  $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. By
+  Corrolary~\ref{circulantCor}, this is
+  true if and only if the matrix
+  \[
+    A =
+    \begin{pmatrix}
+      \alpha & \alpha^p & \alpha^{p^2} & \dots & \alpha^{p^{d-1}} \\
+      \alpha^p & \alpha^{p^2} & \alpha^{p^3} & \dots & \alpha \\
+      \vdots & \vdots & \vdots & & \vdots \\
+      \alpha^{p^{d-1}} & \alpha & \alpha^p & \dots & \alpha^{p^{d-2}}
+    \end{pmatrix}
+  \]
+  is nonsingular. But, reversing the order of the rows in $A$, from the second
+  row to the last, we get the matrix $c[\alpha, \alpha^p, \dots,
+  \alpha^{p^{d-1}}]$, that is nonsingular if and only if $A$ if
+  nonsingular. By Lemma~\ref{henselLm}, $c[\alpha, \alpha^p, \dots,
+  \alpha^{d-1}]$ is nonsingular if and only if $X^d-1$ and
+  $\alpha^{p^{d-1}}X^{d-1}+\dots+\alpha^pX+\alpha$ are relatively prime.
+  This proves the theorem.
+\end{proof}
+We now have a new characterization of normal elements. We can decide if an
+element is normal or not by computing a gcd. It is more efficient that the
+naive matrix method because we have efficient algorithms to compute the gcd.
+The function \texttt{is\_normal} is exactly the implementation of this
+method. The code of this function, and of all the others, is available at
+\url{github.com/edouardRousseau/normalBases}.
 
 \section{Computation of normal bases}
 
