@@ -376,6 +376,33 @@ method. The code of this function, and of all the others, is available at
 \url{github.com/edouardRousseau/normalBases}.
 
 \section{Computation of normal bases}
+Before trying to compute normal elements, a natural question is to wander if
+normal elements always exist in extensions of type
+$\mathbb{F}_{p^{d}}/\mathbb{F}_p$. We do not prove this result here (it is done
+in~\cite{Ga93}), but the answer is yes. Now that this natural fear has been
+eliminated, we give some ways to compute normal elements.
+
+\subsection{Randomized algorithm}
+First, we give a randomized algorithm. Such algorithms are often based on the
+same strategy.
+\begin{enumerate}
+  \item Take a random element, following a certain protocol.
+  \item Check if this element verify the wanted property.
+\end{enumerate}
+Our algorithm also uses this strategy, that is why our first function
+\texttt{is\_normal} is very important. But the protocol is also essential.
+For example, if we just take an element completly at random in
+$\mathbb{F}_{p^d}$, our algorithm will not be very efficient. The following
+theorem helps us defining a better protocol.
+\begin{thm}
+  Let $f(X)$ be an irreducible polynomial of degree $d$ over
+  $\mathbb{F}_p$ and $\alpha$ a root of $f(X)$. Let
+  \[
+    g(X)=\cfrac{f(X)}{(X-\alpha)f'(X)}.
+  \]
+  Then there are at least $p -n(n-1)$ elements $u$ in $\mathbb{F}_p$ such that
+  $g(u)$ is a normal element of $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$.
+\end{thm}
 
 \section{Experimental results}
 
