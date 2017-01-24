@@ -142,13 +142,44 @@ $\mathbb{F}_{p^d}$ (\ie $\sigma$ is a field morphism, a bijection, and $\forall
 y\in\mathbb{F}_p,\;\sigma(y)=y$), as a consequence, $\sigma$ is also a linear
 map.
 
-All these recalls being made, we can begin our journey. Note that we look only
+Note that we look only
 at \emph{prime extensions}, (\ie extensions of type
 $\mathbb{F}_{p^d}/\mathbb{F}_p$). This choice has been made because the theory
 of normal elements in extensions of type $\mathbb{F}_{q^n}/\mathbb{F}_q$ is not
 different (replacing $p$ by $q$ in the following demontrations would be
 sufficient), but the implementation of the algorithms is simpler in the case of
-prime extensions.
+prime extensions. Speaking about implementation, we must introduce Flint
+(Fast Library for Number Theory), because \emph{every} function wrote in this
+project uses Flint.
+
+\subsection{Flint}
+
+Flint~\cite{Ha10} is a C library maintained by William Hart, and developed
+by him and many others since 2007. In Flint, we use the type
+\texttt{fq\_t}, where the elements of $F_{p^d}\cong\mathbb{F}_p[X]/(P)$ are
+represented as polynomials of degree less than $d$. The underlying data
+structure is \texttt{fmpz\_poly\_t}, that is a \texttt{struct} containing
+\begin{enumerate}
+  \item a pointer to arbitrary large integers \texttt{fmpz}, representing the
+    coefficients of the polynomial;
+  \item the number of memory allocations for the pointer of type
+    \texttt{slong}: Flint's own \texttt{unsigned long};
+  \item the degree of the polynomial, a \texttt{slong} too.
+\end{enumerate}
+In Flint, it is possible to work with finite fields of arbitrary large
+order and with polynomials or matrices over these fields. The basic functions
+are already implemented, such as gcd or derivative for polynomials, or reduced
+row echelon form for matrices. Using Flint save a lot of time, but it also has
+its limits. It is possible to deal with arbitrary \emph{prime}
+extensions. For extension of type $\mathbb{F}_{q^n}/\mathbb{F}_q$, it is still
+possible, using polynomial arithmetic over $\mathbb{F}_q$. But using
+polynomials
+over $\mathbb{F}_{q^n}$ would have required polynomial in two
+indeterminates, and everything would be more complicated. That is the reason we
+look only at prime extensions.
+
+All these recalls being made, and the true hero
+(Flint) of our functions being introduced, we can begin our journey.
 
 \section{Basics on normal bases}
 
