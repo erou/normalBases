@@ -60,6 +60,7 @@
 \DeclareMathOperator{\Card}{Card}
 \DeclareMathOperator{\Vect}{Vect}
 \DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Mod}{mod}
 
 
 % Nouvelles commandes
@@ -380,7 +381,7 @@ We are now able to state the last result oh this section.
   $\alpha$ is a normal element, if, by definition, the elements $\alpha,
   \alpha^p, \dots, \alpha^{p^{d-1}}$ form a basis of
   $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. By
-  Corrolary~\ref{circulantCor}, this is
+  Corollary~\ref{circulantCor}, this is
   true if and only if the matrix
   \[
     A =
@@ -411,7 +412,8 @@ Before trying to compute normal elements, a natural question is to wander if
 normal elements always exist in extensions of type
 $\mathbb{F}_{p^{d}}/\mathbb{F}_p$. We do not prove this result here (it is done
 in~\cite{Ga93}), but the answer is yes. Now that this natural fear has been
-eliminated, we give some ways to compute normal elements.
+eliminated, we give some ways to compute normal elements. We use the same
+notations as in the previous section.
 
 \subsection{Randomized algorithm}
 First, we give a randomized algorithm. Such algorithms are often based on the
@@ -431,9 +433,60 @@ theorem helps us defining a better protocol.
   \[
     g(X)=\cfrac{f(X)}{(X-\alpha)f'(X)}.
   \]
-  Then there are at least $p -n(n-1)$ elements $u$ in $\mathbb{F}_p$ such that
+  Then there are at least $p -d(d-1)$ elements $u$ in $\mathbb{F}_p$ such that
   $g(u)$ is a normal element of $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$.
 \end{thm}
+\begin{proof}
+  Let $\sigma_i=\sigma^i$ be the automorphism
+  $\theta\to\theta^{p^i},\theta\in\mathbb{F}_{p^d}$, for $0\leq i <d$. Then
+  $\alpha_i=\sigma_i(\alpha)$ is also a root of $f(X)$, for $0\leq i <d$. The
+  automorphism $\sigma_i:\mathbb{F}_{p^d}\to\mathbb{F}_{p^d}$ can be extended
+  into a ring morphism
+  $\sigma_i:\mathbb{F}_{p^d}[X]\to\mathbb{F}_{p^d}[X]$ by setting
+  $\sigma_i(X)=X$. We get
+  \[
+    g_i(X):=\sigma_i(g(X)) = \cfrac{f(X)}{(X-\alpha_i)f'(\alpha_i)},
+  \]
+  and we note that $\sigma_i\sigma_i(g(X)) = \sigma_{i+j}(g(X))$. Then
+  $g_i(X)$ is a polynomial in $\mathbb{F}_{p^d}[X]$ having $\alpha_k$ as a root
+  for $k\neq i$ and $g_i(\alpha_i)=1$. Hence, for $i\neq k$, we have that every
+  root of $f(X)$ is also a root of $g_i(X)g_k(X)$, so
+  \begin{equation}
+    g_i(X)g_k(X) \equiv 0 \;(\Mod f(X)), \textrm{ for }i\neq k.
+    \label{3.1}
+  \end{equation}
+  Note that 
+  \begin{equation}
+    g_1(X)+g_2(X)+\dots+g_d(X)-1=0,
+    \label{3.2}
+  \end{equation}
+  since the left side is a polynomial of degree at most $d-1$ (all the
+  $g_i$
+  are of degree $d-1$) and has $\alpha_0,
+  \alpha_1, \dots, \alpha_{d-1}$ as roots. Multiplying (\ref{3.2}) by $g_i(X)$
+  and using (\ref{3.1}) to simplify, we have
+  \begin{equation}
+    g_i(X)^2 \equiv g_i(X)\;(\Mod f(x)).
+    \label{3.3}
+  \end{equation}
+  We next set the matrix
+  \[
+    D=(\sigma_{i+j}(g(X)))_{0\leq i,j <0}
+  \]
+  and we study its determinant, $\Delta(X)$. From the equations
+  (\ref{3.1}), (\ref{3.2}) and (\ref{3.3}), we wee that the entries of $D^tD$
+  molulo $f(X)$ are all $0$, except on the main diagonal where they are all
+  $1$. It follows that
+  \[
+    \Delta(X)^2 = \det(D^tD) \equiv 1\;(\Mod f(x)).
+  \]
+  This proves that $\Delta(X)$ is a nonzero polynomial of degree at most
+  $d(d-1)$, since it is a sum of $d$ products of polynomials of degree
+  $d-1$. Therefore $\Delta(X)$ has at most $d(d-1)$ roots in
+  $\mathbb{F}_p$. The result follows from Corollary~\ref{circulantCor}, since the matrix
+  $D(u)$ is exactly the one defined in the corollary applied to the elements
+  $g(u), \sigma(g(u)),\dots,\sigma^{d-1}(g(u))$.
+\end{proof}
 
 \section{Experimental results}
 
