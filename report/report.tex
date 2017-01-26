@@ -8,12 +8,17 @@
 \usepackage{amsmath,amssymb,amsthm,amsopn}
 \usepackage{mathrsfs}
 \usepackage{graphicx}
-\usepackage{hyperref}
 %\usepackage{tikz}
 %\usepackage{array}
 %\usepackage[top=1cm,bottom=1cm]{geometry}
 %\usepackage{listings}
 %\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=red,
+}
 
 % fancy headers and footers
 
@@ -61,6 +66,8 @@
 \DeclareMathOperator{\Vect}{Vect}
 \DeclareMathOperator{\Tr}{Tr}
 \DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\Ord}{Ord}
+\DeclareMathOperator{\lcm}{lcm}
 
 
 % Nouvelles commandes
@@ -487,6 +494,204 @@ theorem helps us defining a better protocol.
   $D(u)$ is exactly the one defined in the corollary applied to the elements
   $g(u), \sigma(g(u)),\dots,\sigma^{d-1}(g(u))$.
 \end{proof}
+Now we have our protocol. We take $u\in\mathbb{F}_p$ at random, then we check
+if $g(u)$ is normal. If $p$ is large enough, for example $p>2d(d-1)$, then
+$g(u)$ is normal with probability at least $1/2$. We will not discuss it, but
+the entire computation takes $O((n+\log q)(n\log q)^2)$ bit operations.
+A reference for this result is given in~\cite{Ga93}. As always, we are not
+\emph{completely} satisfied with randomized algorithm, so we give two
+deterministic algorithms.
+
+\subsection{Deterministic algorithms}
+
+First, we define the $\sigma$-Order of an element
+$\theta\in\mathbb{F}_{p^d}$, both Lenstra's and Lüneburg's algorithms use it.
+
+\subsubsection{The $\sigma$-Order polynomials}
+
+\begin{defi}[$\sigma$-Order]
+  Let $\theta\in\mathbb{F}_{p^d}$ be an arbitrary element. Let $k$ be the least
+  positive integer such that $\sigma^k(\theta)=\theta^{p^k}$ belongs to
+  $\mathbb{F}_p$-linear span of $\left\{ \sigma^i\theta\;|\;0\leq i < k
+  \right\}$. If $\sigma^k\theta=\sum_{i=0}^{k-1}c_i\sigma^i\theta$ for that
+  $k$, then the \emph{$\sigma$-Order} of $\theta$ is the polynomial
+  \[
+    \Ord_\theta(X)=X^k-\sum_{i=0}^{k-1}c_iX^i.
+  \]
+\end{defi}
+The $\sigma$-Order polynomials are widely used in our functions. We compute
+them using Gauss algorithm and the row reduced echelon form. To know if
+$\sigma^j(\theta)$ is in the linear span of $\left\{
+\sigma^i(\theta)\;|\; 0\leq i <j \right\}$, we construct the matrix $M$ whose columns are the
+vectors $\theta, \sigma(\theta), \dots, \sigma^{j}(\theta)$, we compute
+the rank using Gauss algorithm. If the rank is $j+1$ then $\theta,
+\sigma(\theta), \dots, \sigma^j(\theta)$ are linearly independant. In order to
+compute $k$, we do this operation for $j=1$ and while the vectors are linearly
+independant, we increase the value of $j$ by $1$. When we get that the
+vectors are dependant, we use the reduced row echelon form to get a
+$d\times(k+1)$ matrix of type 
+\[
+\begin{pmatrix}
+  1 & 0 & 0 & \dots & 0 & c_0 \\
+  0 & 1 & 0 & \dots & 0 & c_1 \\
+  0 & 0 & 1 & \dots & 0 & c_2 \\
+  \vdots & \vdots & & \ddots & & \vdots \\
+  0 & 0 & 0 & \dots & 1 & c_{k-1} \\
+  0 & 0 & 0 & \dots & 0 & 0 \\
+  \vdots & \vdots & \vdots & & \vdots & \vdots \\
+  0 & 0 & 0 & \dots & 0 & 0 \\
+\end{pmatrix}
+\]
+where the coefficients $c_i$ are in the last column. 
+  
+  
+We also see that an element
+$\alpha\in\mathbb{F}_{p^d}$ is normal is and only if
+$\Ord_\alpha(X)=X^d-1$. This characterization is the same as the
+definition, thus it is not very interesting. The following property is used in
+further demonstrations.
+
+\begin{prop}
+  \label{orderDiv}
+  Let $P\in\mathbb{F}_p[X]$, if $P(\sigma)\zeta=0$, then $P$ is divisible
+  by $\Ord_{\zeta}$.
+\end{prop}
+\begin{proof}
+  Let $I_\zeta$ be the set defined by $I_\zeta=\left\{P\in\mathbb{F}_p[X]\;|\; P(\sigma)\zeta
+  = 0
+\right\}$. This is an ideal of $\mathbb{F}_p[X]$, so $I_\zeta$ is principal. The
+polynomial 
+$\Ord_\zeta$ belongs to $I_\zeta$ and has minimum degree in $I_\zeta$ by definition.
+Hence $I_\zeta=(\Ord_\zeta)$.
+\end{proof}
+We always have $(X^d-1)(\sigma)\theta=0$, so for any
+$\theta\in\mathbb{F}_{p^d}$, we have that $X^d-1$ is divisible by
+$\Ord_\theta$. The result below is also used both in Lenstra's and Lüneburg's
+algorithm.
+\begin{prop}
+  \label{orderMul}
+  Let $\alpha$ and $\beta$ be two elements in $\mathbb{F}_{p^d}$ such that
+  $\Ord_\alpha$ and $\Ord_\beta$ are relatively prime. Then we have
+  $\Ord_{\alpha+\beta}=\Ord_\alpha\Ord_\beta$.
+\end{prop}
+\begin{proof}
+  By linearity, we have
+  \[
+  [(\Ord_\alpha\Ord_\beta)(\sigma)](\alpha+\beta)=[(\Ord_\alpha\Ord_\beta)(\sigma)]\alpha+[(\Ord_\alpha\Ord_\beta)(\sigma)]\beta=0.
+\]
+It follows from Proposition~\ref{orderDiv} that $\Ord_{\alpha+\beta}$ divides
+$\Ord_\alpha\Ord_\beta$. In fact, the same type of equality proves that, for
+any $\alpha,\beta\in\mathbb{F}_{p^d}$ (without any assumption on their
+$\sigma$-polynomials), $\Ord_{\alpha+\beta}$ divides
+$\lcm(\Ord_\alpha, \Ord_\beta)$.
+\end{proof}
+
+\subsubsection{Lenstra's algorithm}
+
+Lenstra's algorithm is based on linear algebra, so our implementation is based
+on the matrices module \texttt{fq\_mat} of Flint. Before describing the
+algorithm, we need two lemmas. 
+\begin{lm}
+  \label{lmExist}
+  Let $\theta\in\mathbb{F}_{p^d}$ with $\Ord_\theta(X)\neq X^d-1$. Let
+  $g(X)=(X^d-1)/\Ord_\theta(X)$. Then there exists
+  $\beta\in\mathbb{F}_{p^d}$ such that
+  \begin{equation}
+    g(\sigma)\beta=\theta.
+    \label{3.4}
+  \end{equation}
+\end{lm}
+\begin{proof}
+  Let $\gamma$ be a normal element of $\mathbb{F}_{p^d}$ over
+  $\mathbb{F}_p$. Then, by definition of being a normal element, there
+  exists a polynomial $f(X)\in\mathbb{F}_{p}[X]$ such that
+  $f(\sigma)\gamma=\theta$. Since $\Ord_\theta(\sigma)\theta=0$, we have
+  $(\Ord_\theta(\sigma)f(\sigma))\gamma=0$. So, by
+  Proposition~\ref{orderDiv}, $\Ord_\theta(X)f(X)$ is
+  divisible by $X^d-1$. We have $g(X)=(X^d-1)/\Ord_\theta(X)$ and $X^d-1|\Ord_\theta(X)f(X)$, so
+$g(X)|f(X)$. Let $f(X)=g(X)h(X)$. Then
+\[
+  g(\sigma)(h(\sigma)\gamma)=\theta.
+\]
+This proves that $\beta=h(\sigma)\gamma$ is a solution of (\ref{3.4}).
+\end{proof}
+\begin{lm}
+  \label{lmDegree}
+  Let $\theta\in\mathbb{F}_{d}$ with $\Ord_\theta(X)\neq X^d-1$. Assume
+  that there exists a solution $\beta$ of (\ref{3.4}) such that
+  $\deg\Ord_{\beta}\leq\deg\Ord_{\theta}$. Then there exists a nonzero
+  element $\zeta\in\mathbb{F}_{p^d}$ such that 
+  \begin{equation}
+    g(\sigma)\zeta=0,
+    \label{3.5}
+  \end{equation}
+  where $g(X)=(X^d-1)/\Ord_\theta(X)$. Moreover any such $\zeta$ has the
+  property that
+  \begin{equation}
+    \deg\Ord_{\theta+\zeta}>\deg\Ord_\theta
+    \label{3.6}
+  \end{equation}
+\end{lm}
+\begin{proof}
+  Let $\gamma$ be a normal element in $\mathbb{F}_{p^d}$ over
+  $\mathbb{F}_p$. We can see that
+  $\zeta=\Ord_\theta(\sigma)\gamma\neq0$ is a solution of~(\ref{3.5}). In
+  fact, we prove that~(\ref{3.6}) is true for any solution $\zeta$
+  of~(\ref{3.5}). From~(\ref{3.4}) and Proposition~\ref{orderDiv}, it follows
+  that $\Ord_\theta$ divides $\Ord_\beta$, so the hypothesis that
+  $\deg\Ord_\beta\leq\deg\Ord_\theta$ implies that
+  $\Ord_\beta=\Ord_\theta$. It follows that $g$ and $\Ord_\theta$ are relatively
+  prime: suppose $\gcd(g, \Ord_\theta)=d$ and $\deg d>0$, let
+  $\Ord_\theta=\Ord_\theta'd=\Ord_\beta$ and $g=g'd$, then
+  $\Ord_\theta'(\sigma)\theta=(\Ord_\theta'
+  g)(\sigma)\beta=(\Ord_\beta g')(\sigma)\beta=0$ and
+  $\deg\Ord_\theta'<\deg\Ord_\beta$,
+  that is a contradiction. Since $\Ord_\zeta$ is a divisor of $g$,
+  $\Ord_\zeta$ and $\Ord_\theta$ are also relatively prime. Therefore,
+  by Proposition~\ref{orderMul}
+  \[
+    \Ord_{\theta+\zeta}=\Ord_\theta\Ord_\zeta,
+  \]
+  and then (\ref{3.6}) follows from the fact that $\zeta\neq0$ and then
+  $\deg\Ord_\zeta\geq1$.
+\end{proof}
+We now have a deterministic algorithm to compute a normal element of
+$\mathbb{F}_{p^d}$ over $\mathbb{F}_p$.
+\begin{enumerate}
+  \item Take an element $\theta\in\mathbb{F}_{p^d}$ and compute
+    $\Ord_\theta$.
+  \item If $\Ord_\theta(X)=X^d-1$ then the algorithm stops ($\theta$ is
+    normal).
+  \item Calculate $g(X)=(X^d-1)/\Ord_\theta$ and then find
+    $\beta\in\mathbb{F}_{p^d}$ such that $g(\sigma)\beta=\theta$.
+  \item Determine $\Ord_\beta$. If $\deg\Ord_\beta>\deg\Ord_\theta$ then
+    replace $\theta$ by $\beta$ and go to $2$; otherwise if
+    $\deg\Ord_\beta\leq\deg\Ord_\theta$ then find a nonzero element $\zeta$
+    such that $g(\sigma)\zeta=0$, replace $\theta$ by $\theta+\zeta$ and
+    determine the $\sigma$-Order of the new $\theta$, then go to $2$.
+\end{enumerate}
+This algorithm ends because with each replacement of $\theta$, the degree of
+$\Ord_\theta$ increases by at least one, by Lemma~\ref{lmDegree}, and because
+this degree is bounded by $d$ since the only possible $\sigma$-Order of degree
+$d$ is $X^d-1$. The existence of the elements $\beta$ of step $3$ is guaranteed
+by Lemma~\ref{lmExist} and the existence of $\zeta$ of step $4$ by
+Lemma~\ref{lmDegree}. Since $g(\sigma)$ is a linear map, we compute $\beta$ and
+$\zeta$, using Gauss algorithm and reduced row echelon form again.
+
+\subsection{Lüneburg's algorithm}
+Lüneburg algorithm is more elementary, it is not based on a powerfull theory
+like linear algebra. Let $f$ be an irreducible polynomial of degree $d$ over
+$\mathbb{F}_p$ and $\alpha$ a root of $f$. Then $\left\{ 1, \alpha, \dots,
+  \alpha^{d-1}
+\right\}$ is a basis of $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. Let
+$f_i=\Ord_{\alpha^i}$, for $0\leq i < d$. Let
+$\gamma=\sum_{i=0}^{d-1}a_i\alpha^i$ be a normal element of
+$\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. Note that for any
+$a_i\in\mathbb{F}_p$, $\Ord_{a_i\alpha_i}=\Ord_{\alpha^i}=f_i$, and as seen in the
+demonstration of Proposition~\ref{orderMul}, $\Ord_\gamma=X^d-1$ divides
+$\lcm(f_0, \dots, f_{d-1})$. Since for all $i$, $f_i$ divides $X^d-1$, we have that
+$\lcm(f_0, \dots, f_{d-1})$ divides $X^d-1$. Therefore $\lcm(f_0, \dots,
+f_{d-1})=X^d-1$.
 
 \section{Experimental results}
 

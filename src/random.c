@@ -47,13 +47,11 @@ void normal_random(fq_t res, const fq_ctx_t field) {
 	fq_init(tmp1, field);
 	fq_init(tmp2, field);
 
-	// We take u at random
-	fq_randtest(u, state, field);
-
-	// But not equal to root, not to divise by zero
-	while (fq_equal(u, root, field)) {
-		fq_randtest(u, state, field);
-	}
+	// We take u at random in F_p
+    fmpz_t r;
+    fmpz_init(r);
+    fmpz_randm(r, state, fq_ctx_prime(field));
+    fq_set_fmpz(u, r, field);
 
 	// tmp1 = g(u)
 	fq_sub(tmp1, u, root, field);
@@ -65,11 +63,9 @@ void normal_random(fq_t res, const fq_ctx_t field) {
 
 	// while g(u) is not normal, we take an other u and we do the same
 	while (!(is_normal(tmp1, field))) {
-		fq_randtest(u, state, field);
 
-		while (fq_equal(u, root, field)) {
-			fq_randtest(u, state, field);
-		}
+        fmpz_randm(r, state, fq_ctx_prime(field));
+        fq_set_fmpz(u, r, field);
 
 		fq_sub(tmp1, u, root, field);
 		fq_poly_evaluate_fq(tmp2, fprime, root, field);
@@ -88,4 +84,5 @@ void normal_random(fq_t res, const fq_ctx_t field) {
 	fq_clear(u,field);
 	fq_clear(tmp1,field);
 	fq_clear(tmp2,field);
+    fmpz_clear(r);
 }
