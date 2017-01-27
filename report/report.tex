@@ -678,7 +678,7 @@ by Lemma~\ref{lmExist} and the existence of $\zeta$ of step $4$ by
 Lemma~\ref{lmDegree}. Since $g(\sigma)$ is a linear map, we compute $\beta$ and
 $\zeta$, using Gauss algorithm and reduced row echelon form again.
 
-\subsection{Lüneburg's algorithm}
+\subsubsection{Lüneburg's algorithm}
 Lüneburg algorithm is more elementary, it is not based on a powerfull theory
 like linear algebra. Let $f$ be an irreducible polynomial of degree $d$ over
 $\mathbb{F}_p$ and $\alpha$ a root of $f$. Then $\left\{ 1, \alpha, \dots,
@@ -687,11 +687,19 @@ $\mathbb{F}_p$ and $\alpha$ a root of $f$. Then $\left\{ 1, \alpha, \dots,
 $f_i=\Ord_{\alpha^i}$, for $0\leq i < d$. Let
 $\gamma=\sum_{i=0}^{d-1}a_i\alpha^i$ be a normal element of
 $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. Note that for any
-$a_i\in\mathbb{F}_p$, $\Ord_{a_i\alpha_i}=\Ord_{\alpha^i}=f_i$, and as seen in the
+$a_i\in\mathbb{F}_p$, $\Ord_{a_i\alpha^i}=\Ord_{\alpha^i}=f_i$, and as seen in the
 demonstration of Proposition~\ref{orderMul}, $\Ord_\gamma=X^d-1$ divides
 $\lcm(f_0, \dots, f_{d-1})$. Since for all $i$, $f_i$ divides $X^d-1$, we have that
 $\lcm(f_0, \dots, f_{d-1})$ divides $X^d-1$. Therefore $\lcm(f_0, \dots,
-f_{d-1})=X^d-1$.
+f_{d-1})=X^d-1$. Then we apply the \emph{factor
+refinement}~\cite{BaDrSh93}. It is an algorithm that, given a list of
+polynomials $f_0, \dots, f_{d-1}$, compute a new list $g_1, \dots, g_r$ of
+polynomials, pairwise relatively prime, such that
+\[ \prod_{i=0}^{d-1} f_i=\prod_{j=1}^{r} g_j^{e_j}. \]
+The factor refinement works that way: we first set $h_i=f_i$ and $e_i=1$ for $0\leq i
+<d$ and we consider the list $(h_i, e_i)_{i}$. While there exists $i\neq j$ with $p:=\gcd(h_i, h_j)\neq1$, we delete
+$(h_i,e_i)$ and $(h_j,e_j)$ from the list and we add $(p, e_i+e_j),( h_i/p,
+e_i), (h_j/p, e_j)$, except for the cases where the first entry is $1$.
 
 \section{Experimental results}
 
