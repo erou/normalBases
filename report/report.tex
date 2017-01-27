@@ -542,7 +542,8 @@ $d\times(k+1)$ matrix of type
   0 & 0 & 0 & \dots & 0 & 0 \\
 \end{pmatrix}
 \]
-where the coefficients $c_i$ are in the last column. 
+where the coefficients $c_i$ are in the last column. This strategy is
+implemented in the function \texttt{sigma\_order}.
   
   
 We also see that an element
@@ -569,21 +570,48 @@ $\theta\in\mathbb{F}_{p^d}$, we have that $X^d-1$ is divisible by
 $\Ord_\theta$. The result below is also used both in Lenstra's and Lüneburg's
 algorithm.
 \begin{prop}
+  \label{orderLcm}
+  Let $\alpha$ and $\beta$ be two elements in $\mathbb{F}_{p^d}$. Then we
+  have \[
+    \Ord_{\alpha+\beta}\;|\;\lcm(\Ord_\alpha,\Ord_\beta).
+  \]
+\end{prop}
+\begin{proof}
+ Let $P=\lcm(\Ord_\alpha,\Ord_\beta)$. By linearity, we have
+  \[
+  P(\sigma)(\alpha+\beta)=P(\sigma)\alpha+P(\sigma)\beta=0+0=0.
+\]
+It follows from Proposition~\ref{orderDiv} that $\Ord_{\alpha+\beta}$ divides
+$P$.
+\end{proof}
+\begin{cor}
   \label{orderMul}
   Let $\alpha$ and $\beta$ be two elements in $\mathbb{F}_{p^d}$ such that
   $\Ord_\alpha$ and $\Ord_\beta$ are relatively prime. Then we have
   $\Ord_{\alpha+\beta}=\Ord_\alpha\Ord_\beta$.
-\end{prop}
+\end{cor}
 \begin{proof}
-  By linearity, we have
+  Since $\Ord_\alpha$ and $\Ord_\beta$ are relatively prime, we have
+  $\lcm(\Ord_\alpha, \Ord_\beta)=\Ord_\alpha\Ord_\beta$. It follows from
+  Proposition~\ref{orderLcm} that $\Ord_{\alpha+\beta}$ divides
+  $\Ord_\alpha\Ord_\beta$. Now, note that for any
+  $\theta\in\mathbb{F}_{p^d}$, $\Ord_{-\theta}=\Ord_\theta$, then we also have 
   \[
-  [(\Ord_\alpha\Ord_\beta)(\sigma)](\alpha+\beta)=[(\Ord_\alpha\Ord_\beta)(\sigma)]\alpha+[(\Ord_\alpha\Ord_\beta)(\sigma)]\beta=0.
-\]
-It follows from Proposition~\ref{orderDiv} that $\Ord_{\alpha+\beta}$ divides
-$\Ord_\alpha\Ord_\beta$. In fact, the same type of equality proves that, for
-any $\alpha,\beta\in\mathbb{F}_{p^d}$ (without any assumption on their
-$\sigma$-polynomials), $\Ord_{\alpha+\beta}$ divides
-$\lcm(\Ord_\alpha, \Ord_\beta)$.
+    \Ord_{\alpha}\;|\;\lcm(\Ord_{\alpha+\beta}, \Ord_\beta)
+  \]
+  \[
+    \Ord_{\beta}\;|\;\lcm(\Ord_{\alpha+\beta}, \Ord_\alpha).
+  \]
+  Since $\Ord_\alpha$ and $\Ord_\beta$ are relatively prime, it follows
+  that
+  \[
+    \Ord_{\alpha}\;|\;\Ord_{\alpha+\beta}
+  \]
+  \[
+    \Ord_{\beta}\;|\;\Ord_{\alpha+\beta}.
+  \]
+  Therefore, $\Ord_\alpha\Ord_\beta$ divides $\Ord_{\alpha+\beta}$. Both
+  polynomial are monic so we have the wanted equality.
 \end{proof}
 
 \subsubsection{Lenstra's algorithm}
@@ -648,7 +676,7 @@ This proves that $\beta=h(\sigma)\gamma$ is a solution of (\ref{3.4}).
   $\deg\Ord_\theta'<\deg\Ord_\beta$,
   that is a contradiction. Since $\Ord_\zeta$ is a divisor of $g$,
   $\Ord_\zeta$ and $\Ord_\theta$ are also relatively prime. Therefore,
-  by Proposition~\ref{orderMul}
+  by Corollary~\ref{orderMul}
   \[
     \Ord_{\theta+\zeta}=\Ord_\theta\Ord_\zeta,
   \]
@@ -676,7 +704,12 @@ this degree is bounded by $d$ since the only possible $\sigma$-Order of degree
 $d$ is $X^d-1$. The existence of the elements $\beta$ of step $3$ is guaranteed
 by Lemma~\ref{lmExist} and the existence of $\zeta$ of step $4$ by
 Lemma~\ref{lmDegree}. Since $g(\sigma)$ is a linear map, we compute $\beta$ and
-$\zeta$, using Gauss algorithm and reduced row echelon form again.
+$\zeta$, using Gauss algorithm and reduced row echelon form again. Computing
+elements of type $g(\sigma)\theta$ is not just polynomial evaluation,
+and is widely used in our algorithms, so we have a special function
+\texttt{sigma\_composition} to do it. The rest of the algorithm is
+essentially linear algebra, it uses Flint matrices and is in the function
+\texttt{lenstra}.
 
 \subsubsection{Lüneburg's algorithm}
 Lüneburg algorithm is more elementary, it is not based on a powerfull theory
@@ -688,7 +721,7 @@ $f_i=\Ord_{\alpha^i}$, for $0\leq i < d$. Let
 $\gamma=\sum_{i=0}^{d-1}a_i\alpha^i$ be a normal element of
 $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. Note that for any
 $a_i\in\mathbb{F}_p$, $\Ord_{a_i\alpha^i}=\Ord_{\alpha^i}=f_i$, and as seen in the
-demonstration of Proposition~\ref{orderMul}, $\Ord_\gamma=X^d-1$ divides
+demonstration of Corollary~\ref{orderMul}, $\Ord_\gamma=X^d-1$ divides
 $\lcm(f_0, \dots, f_{d-1})$. Since for all $i$, $f_i$ divides $X^d-1$, we have that
 $\lcm(f_0, \dots, f_{d-1})$ divides $X^d-1$. Therefore $\lcm(f_0, \dots,
 f_{d-1})=X^d-1$. Then we apply the \emph{factor
@@ -699,7 +732,42 @@ polynomials, pairwise relatively prime, such that
 The factor refinement works that way: we first set $h_i=f_i$ and $e_i=1$ for $0\leq i
 <d$ and we consider the list $(h_i, e_i)_{i}$. While there exists $i\neq j$ with $p:=\gcd(h_i, h_j)\neq1$, we delete
 $(h_i,e_i)$ and $(h_j,e_j)$ from the list and we add $(p, e_i+e_j),( h_i/p,
-e_i), (h_j/p, e_j)$, except for the cases where the first entry is $1$.
+e_i), (h_j/p, e_j)$, except for the cases where the first entry is $1$. This
+algorithm stops and compute what we expect. In our case, we use it to compute
+the pairwise relatively prime polynomials $g_j$ $(1\leq j \leq r)$, and then
+we compute the integers $e_{ij}$ such that 
+\[
+  f_i=\prod_{1\leq j \leq r}g_j^{e_{ij}}\textrm{, for all }0\leq i<d.
+\]
+This algorithm is implemented in the function
+\texttt{factor\_refinement}, it uses Flint's type
+\texttt{fq\_poly\_factor} to represent the list $(h_i, e_i)_i$ and to let Flint
+deal with the memory allocation.
+
+Next, for each $j$, $1\leq j \leq r$, we find an index $i(j)$ such that
+$e_{ij}$ is maximized. Let 
+\[
+  h_j=f_{i(j)}/g_j^{e_{i(j)j}}
+\] 
+and take $\beta_j=h_j(\sigma)\alpha^{i(j)}$. Then
+\[
+  \beta=\sum_{j=1}^r\beta_j
+\] 
+is a normal element of $\mathbb{F}_{p^d}$ over $\mathbb{F}_p$. In fact, the
+$\sigma$-Order of $\beta_j$ is $g_j^{e_{i(j)j}}$ ($\beta_j$ has been
+constructed in that purpose) for $1\leq j \leq r$. As $g_1, \dots, g_r$ are
+pairwise relatively prime, Corollary~\ref{orderMul} states that the
+$\sigma$-Order of $\beta$ must 
+\[
+  \prod_{j=1}^rg_j^{e_{i(j)j}}=\lcm(f_0, \dots, f_{d-1})=X^d-1,
+\]
+meaning that $\beta$ is a normal element. 
+
+To implement this algorithm, we use our functions
+\texttt{sigma\_composition},
+\texttt{sigma\_order}, \texttt{factor\_refinement}, and Flint's basic functions to deal with
+polynomials. The implementation is a translation of the steps we followed
+to obtain $\beta$.
 
 \section{Experimental results}
 
