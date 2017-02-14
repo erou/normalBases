@@ -11,7 +11,7 @@
 
 // Help function
 void help(const char* prog) {
-	fprintf(stderr, "Usage : %s [-p characteristic] [-d degreeOfExtension] [-a (random|Luneburg|Lenstra)]\n", prog);
+	fprintf(stderr, "Usage : %s [-p characteristic] [-d degreeOfExtension] [-a (naive|random|Luneburg|Lenstra)]\n", prog);
 }
 
 int main(int argc, char **argv) {
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 				d = atol(optarg);
 				break;
 			case 'a':
-				alg = optarg[1];
+				alg = optarg[3];
 				break;
 			default:
 				help(argv[0]);
@@ -75,8 +75,8 @@ int main(int argc, char **argv) {
 		fq_zero(res, field);	
 
 		switch (alg) {
-			case 'a':
-			case 'A':
+			case 'd':
+			case 'D':
 				normal_random(res, field);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
@@ -85,8 +85,8 @@ int main(int argc, char **argv) {
 				}
 				
 				break;
-			case 'u':
-			case 'U':
+			case 'e':
+			case 'E':
 				luneburg(res, field);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
@@ -94,9 +94,18 @@ int main(int argc, char **argv) {
 				    flint_printf("\n");
 				}
 				break;
-			case 'e':
-			case 'E':
+			case 's':
+			case 'S':
 				lenstra(res, field);
+				sigma_order(ord, res, field);
+				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
+				    fq_print_pretty(res, field);
+				    flint_printf("\n");
+				}
+				break;
+			case 'v':
+			case 'V':
+				naive(res, field);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
 				    fq_print_pretty(res, field);

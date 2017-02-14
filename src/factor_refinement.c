@@ -22,6 +22,9 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 	// We set some indices 
 	slong i, j, k;
 
+    // And a boolean value
+    int b = 1;
+
 	// We initialise the gcd and quotient polynomials
 	fq_poly_t gcd, quo;
 	fq_poly_init(gcd, field);
@@ -45,9 +48,12 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 
 			// We compute the gcd of f_i and f_j
 			fq_poly_gcd(gcd, res->poly + i, res->poly + j, field);
+
 			// If it is not 1, we add f_i/gcd, f_j/gcd and gcd to
 			// the factors, unless f_i/gcd = 1
 			if (!fq_poly_is_one(gcd, field)) {
+
+                b = 0;
 
 				if (!fq_poly_equal(gcd, res->poly + i, field)) {
 					fq_poly_divides(quo, res->poly + i, gcd, field);
@@ -59,7 +65,6 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 					fq_poly_factor_insert(res, quo, 1, field);
 				}
 
-				fq_poly_factor_insert(copy, gcd, 1, field);
 				// and we delete f_i and f_j
 				// in fact : we copy all the list but f_i and
 				// f_j : we do not know how to do better
@@ -69,6 +74,8 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 					}
 				}
 
+				fq_poly_factor_insert(copy, gcd, 1, field);
+
 				// and we set res to copy, which is res
 				// without f_i and f_j
 				fq_poly_factor_set(res, copy, field);				
@@ -77,12 +84,15 @@ void factor_refinement(fq_poly_factor_t res, const fq_poly_factor_t fac, const f
 			}
 		}
 
-		// if we went to j = n, this means that f_i
-		// is coprime with any f_j, so we do not touch
+		// if b = 1, it means we never entered in the previous if
+        // so f_i is coprime with any f_j, therefore we do not touch
 		// this f_i until the end
-		if (j == res->num) {
-			i++;
-		}
+		if (b) {
+            i++;
+        }
+        else {
+            b = 1;
+        }
 	}
 
 	// We clear the variables

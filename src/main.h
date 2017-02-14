@@ -38,3 +38,5 @@ slong highest_exp(const fq_poly_t, const fq_poly_t, const fq_ctx_t);
 void luneburg(fq_t, const fq_ctx_t);
 
 void lenstra(fq_t, const fq_ctx_t);
+
+void naive(fq_t, const fq_ctx_t);

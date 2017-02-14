@@ -68,11 +68,6 @@ void luneburg(fq_t res, const fq_ctx_t field) {
 	factor_refinement(g, f, field);
 	n = g->num;
 
-    fq_poly_factor_print_pretty(f, "Z", field);
-    flint_printf("\n\n");
-    fq_poly_factor_print_pretty(g, "Z", field);
-    flint_printf("\n\n");
-
 	/* In the loop, we compute the indice
 	 * i(j) such that e_i(j)j is maximal and we
 	 * add β_j to rop
