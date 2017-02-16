@@ -19,6 +19,7 @@
 #include <fq.h>
 #include <fq_poly.h>
 #include <fq_mat.h>
+#include <profiler.h>
 
 // Functions 
 int is_normal(const fq_t, const fq_ctx_t);

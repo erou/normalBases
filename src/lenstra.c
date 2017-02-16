@@ -95,11 +95,11 @@ void lenstra(fq_t res, const fq_ctx_t field) {
 		// We compute Ord_β
 		sigma_order(ordBeta, tmp2, field);
 
-		/* If the degree of ordTheta is higher than the degree
-		 * of ordBeta, we change beta for theta = tmp2 and we
+		/* If the degree of ord_θ is higher than the degree
+		 * of ord_β, we change θ for β = tmp2 and we
 		 * continue in the while loop. If not, we look for an 
 		 * element ζ such that g(σ)(ζ) = 0 and we set
-		 * β to θ + ζ.
+		 * θ to θ + ζ.
 		 */
 		if (ordTheta->length < ordBeta->length) {
 				fq_set(theta, tmp2, field);

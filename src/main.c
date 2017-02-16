@@ -16,6 +16,8 @@ void help(const char* prog) {
 
 int main(int argc, char **argv) {
 
+    timeit_t t;
+
 	// Initialisation of the variables
 	fmpz_t p;
 	fmpz_init(p);
@@ -77,7 +79,10 @@ int main(int argc, char **argv) {
 		switch (alg) {
 			case 'd':
 			case 'D':
+                timeit_start(t);
 				normal_random(res, field);
+                timeit_stop(t);
+                flint_printf("cpu = %wd ms  wall = %wd ms\n",t->cpu,t->wall);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
 				    fq_print_pretty(res, field);
@@ -87,7 +92,10 @@ int main(int argc, char **argv) {
 				break;
 			case 'e':
 			case 'E':
+                timeit_start(t);
 				luneburg(res, field);
+                timeit_stop(t);
+                flint_printf("cpu = %wd ms  wall = %wd ms\n",t->cpu,t->wall);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
 				    fq_print_pretty(res, field);
@@ -96,7 +104,10 @@ int main(int argc, char **argv) {
 				break;
 			case 's':
 			case 'S':
+                timeit_start(t);
 				lenstra(res, field);
+                timeit_stop(t);
+                flint_printf("cpu = %wd ms  wall = %wd ms\n",t->cpu,t->wall);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
 				    fq_print_pretty(res, field);
@@ -105,7 +116,10 @@ int main(int argc, char **argv) {
 				break;
 			case 'v':
 			case 'V':
+                timeit_start(t);
 				naive(res, field);
+                timeit_stop(t);
+                flint_printf("cpu = %wd ms  wall = %wd ms\n",t->cpu,t->wall);
 				sigma_order(ord, res, field);
 				if (is_normal(res, field) && fq_poly_equal(ord, P, field)) {
 				    fq_print_pretty(res, field);

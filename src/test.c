@@ -10,6 +10,10 @@ void main() {
 	fq_ctx_t field;
 	fq_ctx_init(field, p, d, "X");
 	fq_ctx_print(field);
+    fq_ctx_clear(field);
+
+	fq_ctx_init(field, p, d, "X");
+	fq_ctx_print(field);
 
 	fq_poly_t P;
 	fq_poly_init(P, field);
@@ -19,13 +23,7 @@ void main() {
 	fq_init(X, field);
     fq_gen(X, field);
 
-    for (slong i=0; i < 31; i++) {
-        flint_printf("%wd : ",i);
-        fq_pow_ui(res, X, i, field);
-        sigma_order(P, res, field);
-        fq_poly_print_pretty(P, "Z", field);
-        flint_printf("\n");
-    }
+    ceil(1.1*d);
 
 	fq_clear(res, field);
 	fq_clear(X, field);
