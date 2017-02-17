@@ -29,8 +29,8 @@ void main() {
     slong max;
 
     // Choice of parameters :
-    fmpz_set_ui(p, 1993);
-    max = 40;
+    fmpz_set_ui(p, 90001);
+    max = 300;
 
     // We open the file `bench.txt`
     FILE *file;
@@ -40,6 +40,7 @@ void main() {
 
 
     while (d < max) {
+	flint_printf("d : %wd\n", d);
         flint_fprintf(file, "%wd    ", d);
 
         fq_ctx_init(field, p, d, "X");
