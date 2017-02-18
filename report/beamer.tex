@@ -1,0 +1,327 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  This Beamer template was created by Cameron Bracken.
+%%  Anyone can freely use or modify it for any purpose
+%%  without attribution.
+%%
+%%  Last Modified: January 9, 2009
+%%
+
+\documentclass[xcolor=x11names,compress]{beamer}
+
+%% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb,amsthm,amsopn}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+%\usepackage{tikz}
+%\usepackage{array}
+%\usepackage[top=1cm,bottom=1cm]{geometry}
+%\usepackage{listings}
+%\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=red,
+}
+
+\newtheoremstyle{break}%
+{}{}%
+{\itshape}{}%
+{\bfseries}{}%  % Note that final punctuation is omitted.
+{\newline}{}
+
+\newtheoremstyle{sc}%
+{}{}%
+{}{}%
+{\scshape}{}%  % Note that final punctuation is omitted.
+{\newline}{}
+
+\theoremstyle{break}
+\newtheorem{thm}{Théorème}[section]
+\newtheorem{lm}[thm]{Lemme}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollaire}
+
+\theoremstyle{sc}
+\newtheorem{exo}{Exercice}
+
+\theoremstyle{definition}
+\newtheorem{defi}[thm]{Définition}
+\newtheorem{ex}[thm]{Exemple}
+
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remarque}
+
+% Raccourcis pour les opérateurs mathématiques (les espaces avant-après sont
+% modifiés pour mieux rentrer dans les codes mathématiques usuels)
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Img}{Im}
+\DeclareMathOperator{\Card}{Card}
+\DeclareMathOperator{\Vect}{Vect}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Mod}{mod}
+\DeclareMathOperator{\Ord}{Ord}
+\DeclareMathOperator{\ppcm}{ppcm}
+
+
+% Nouvelles commandes
+\newcommand{\ps}[2]{\left\langle#1,#2\right\rangle}
+\newcommand{\ent}[2]{[\![#1,#2]\!]}
+\newcommand{\diff}{\mathop{}\!\mathrm{d}}
+\newcommand{\ie}{\emph{i.e. }}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Beamer Layout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\useoutertheme[subsection=false,shadow]{miniframes}
+\useinnertheme{default}
+\usefonttheme{serif}
+\usepackage{palatino}
+
+\setbeamerfont{title like}{shape=\scshape}
+\setbeamerfont{frametitle}{shape=\scshape}
+
+\setbeamercolor*{lower separation line head}{bg=DeepSkyBlue4} 
+% \setbeamercolor*{normal text}{fg=black,bg=white} 
+% \setbeamercolor*{alerted text}{fg=red} 
+% \setbeamercolor*{example text}{fg=black} 
+% \setbeamercolor*{structure}{fg=black} 
+%  
+\setbeamercolor*{palette tertiary}{fg=black,bg=black!10} 
+\setbeamercolor*{palette quaternary}{fg=black,bg=black!10} 
+% 
+% \renewcommand{\(}{\begin{columns}}
+% \renewcommand{\)}{\end{columns}}
+% \newcommand{\<}[1]{\begin{column}{#1}}
+% \renewcommand{\>}{\end{column}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\title{Génaration d'éléments normaux en C}
+%\subtitle{SUBTITLE}
+% \author{
+% 	Édouard Rousseau\\
+% 	{\it Université de Versailles}\\
+% }
+\date{\today}
+\titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Table des matières}
+\tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\scshape Introduction}
+\subsection{Contexte}
+\begin{frame}{Contexte}
+  On travail dans des \emph{extensions de corps finis} 
+  \[
+    \mathbb{F}_{p^d}/\mathbb{F}_p
+  \]
+  où $\mathbb{F}_p\cong \mathbb{Z}/p\mathbb{Z}$ est le corps à $p$ éléments, et
+  plus généralement $\mathbb{F}_{p^d}\cong\mathbb{F}_p[X]/(P(X))$ (où $P$ est un
+  polynôme irréductible de degré $d$ de $\mathbb{F}_p[X]$) est le corps à $p^d$ éléments.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Rappels et notations}
+  \begin{prop}
+  Le corps $\mathbb{F}_{p^d}$ est un $\mathbb{F}_p$-espace vectoriel de
+  dimension $d$ : une base est $\left\{ 1, X, \dots, X^{d-1} \right\}$.
+  \end{prop}
+  \begin{defi}[automorphisme de Frobenius]
+    On note $\sigma$ \emph{l'automorphisme de Frobenius}
+    \[
+      \begin{array}{cccc}
+        \sigma: & \mathbb{F}_{p^d} & \to & \mathbb{F}_{p^d} \\
+        & x & \mapsto & x^p.
+      \end{array}
+    \]
+  \end{defi}
+\end{frame}
+\subsection{Éléments normaux}
+\begin{frame}{Éléments normaux : définition}
+  \begin{defi}[élément normal]
+    Soit $\alpha\in\mathbb{F}_{p^d}$, on dit que $\alpha$ est un \emph{élément
+    normal} si $\left\{ \alpha, \sigma(\alpha), \dots, \sigma^{d-1}(\alpha)
+  \right\} = \left\{ \alpha, \alpha^p, \dots, \alpha^{p^{d-1}} \right\}$ est une
+  base de $\mathbb{F}_{p^d}$.
+  \end{defi}
+  Ce type de base est appelé \emph{base normale}.
+\end{frame}
+
+\begin{frame}{Existence d'éléments normaux}
+  \begin{thm}
+    Soit $\mathbb{F}_{p^d}/\mathbb{F}_p$ une extension de corps finie. Il existe
+    un élément normal $\alpha$ pour cette extension.
+  \end{thm}
+  Le but du projet était donc de réussir à générer de tels éléments.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\scshape Génération d'éléments normaux}
+\begin{frame}{Présentation des algorithmes}
+  On va voir trois algorithmes.
+
+  \begin{itemize}
+    \item Algorithme randomisé $O((n+\log q)(n\log q)^2)$
+    \item Algorithme de Lüneburg $O((n^{\alert{2}<2>}+\log q)(n\log q)^2)$
+    \item Algorithme de Lenstra $O((n^{\alert{2}<2>}+\log q)(n\log q)^2)$
+  \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Algorithme randomisé}
+\begin{frame}{Une propostion utile}
+  \begin{prop}
+    Soit $\alpha\in\mathbb{F}_{p^d}$ et
+    $P=\alpha^{p^{d-1}}X^{d-1}+\dots+\alpha^pX+\alpha.$
+    L'élément $\alpha$ est normal si et seulement si $P$ et $X^d-1$ sont
+    premiers entre eux.
+  \end{prop}
+  On en déduit un algorithme de test pour savoir si un élément est normal.
+\end{frame}
+
+\begin{frame}{Algorithme randomisé naïf}
+  On déduit également un algorithme pour générer des éléments normaux.
+  \begin{itemize}
+    \item<2-> Prendre un élément $\alpha\in\mathbb{F}_{p^d}$ au hasard.
+    \item<3-> Vérifier s'il est normal, en utilisant la proposition précédente. 
+    \item<4-> S'il est normal, on le garde; sinon, on recommence.
+  \end{itemize}
+
+  \uncover<5>{Mais on peut faire mieux.}
+\end{frame}
+
+\begin{frame}{Algorithme randomisé élaboré}
+  \begin{prop}
+    Soit $f(X)$ un polynôme irréductible de degré $d$ de $\mathbb{F}_p[X]$ et
+    $\alpha$ une racine de $f$. Soit 
+    \[
+      g(X) = \frac{f(X)}{(X-\alpha)f'(\alpha)}.
+    \]
+    Il y a alors au moins $p-d(d-1)$ éléments $u\in\mathbb{F}_p$ tels que $g(u)$
+    soit un élément normal de $\mathbb{F}_{p^d}$.
+  \end{prop}
+  Ainsi, si $p>2d(d-1)$, on a au moins une chance sur deux que $g(u)$ soit un
+  élément normal.
+\end{frame}
+
+\begin{frame}{Algorithme randomisé élaboré}
+  On a ainsi un algorithme plus efficace.
+  \begin{itemize}
+    \item<2-> Prendre un élément $u\in\mathbb{F}_{p}$ au hasard.
+    \item<3-> Vérifier si $g(u)$ est normal. 
+    \item<4-> Si $g(u)$ est normal, on s'arrête; sinon, on recommence.
+  \end{itemize}
+
+  \uncover<5>{Mais pour garantir que cet algorithme fonctionne, il faut au moins que
+  $p>d(d-1)$.}
+\end{frame}
+
+\subsection{Algorithmes déterministes}
+\begin{frame}{Polynômes de $\sigma$-ordre}
+  \begin{defi}[polynôme de $\sigma$-ordre]
+      Soit $\theta\in\mathbb{F}_{p^d}$ un élément. Soit $k$ le plus petit entier
+      positif tel que $\sigma^k(\theta)=\theta^{p^k}$ appartienne au sous-espace
+      vectoriel engendré par $\left\{ \sigma^i(\theta)\;|\;0\leq i<k \right\}$.
+      Si $\sigma^k(\theta)=\sum_{i=0}^{k-1}c_i\sigma^i(\theta)$, alors on
+      définit le polynôme de $\sigma$-ordre de $\theta$ comme
+      \[
+        \Ord_{\theta}(X)=X^k-\sum_{i=0}^{k-1}c_iX^i.
+      \]
+  \end{defi}
+\end{frame}
+
+\begin{frame}{Polynômes de $\sigma$-ordre : propriétés}
+  \begin{prop}
+   On a les propriétés suivantes :
+   \begin{itemize}
+     \item L'élément $\theta$ est normal si et seulement si $\Ord_\theta=X^d-1$.
+     \item Si $P(\sigma)\theta = 0$, alors $\Ord_\theta$ divise $P$.
+     \item Soit $\alpha,\beta\in\mathbb{F}_{p^d}$, $\Ord_{\alpha+\beta}$ divise
+       $\ppcm(\Ord_\alpha, \Ord_\beta)$.
+     \item Si $\Ord_\alpha$ et $\Ord_\beta$ sont premiers entre eux,
+       $\Ord_{\alpha+\beta}=\Ord_\alpha\Ord_\beta$.
+   \end{itemize}
+  \end{prop}
+\end{frame}
+
+\begin{frame}{Algorithme de Lüneburg}
+  \begin{itemize}
+    \item<1-> Générer $f_i=\Ord_{X^i}$, pour $0\leq i < d$. 
+      \begin{itemize}
+        \item<2-> On a $\ppcm(f_0, \dots, f_{d-1})=X^d-1$.
+      \end{itemize}
+    \item<3-> Écrire, pour chaque $i$
+      \[
+        f_i=\prod_{j=1}^rg_{j}^{e_{i,j}}
+      \]
+      où les $g_j$ sont premiers entre eux deux à deux.
+    \item<4-> Trouver $i(j)$ tel que $e_{i(j),j}$ soit maximal parmi les
+      $e_{i,j}$.
+    \item<5-> Calculer $h_j=f_{i(j)}/g_j^{e_{i(j),j}}$ puis
+      $\beta_j=h_j(\sigma)X^{i(j)}$
+      \begin{itemize}
+        \item<6-> On a $\Ord_{\beta_j}=g_j^{e_{i(j),j}}$.
+      \end{itemize}
+    \item<7-> Alors $\beta=\sum_{j=1}^r\beta_j$ est normal.
+      \begin{itemize}
+        \item<8-> En effet
+          $\Ord_\beta=\prod_{j=1}^r\Ord_{b_j}=\prod_{j=1}^rg_j^{e_{i(j),j}}=X^d-1$.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithme de Lenstra}
+  L'algoithme de Lenstra fonctionne de la façon suivante.
+  \begin{itemize}
+    \item On prend un élément $\theta\in\mathbb{F}_{p^d}$ quelconque et on
+      calcule $\Ord_\theta$.
+    \item<2-> Si $\Ord_\theta=X^d-1$ on s'arrête; sinon, on modifie $\theta$ pour
+      que $\Ord_\theta$ monte de degré.
+  \end{itemize}
+  
+  \uncover<3>{Comme $\Ord_\theta$ divise $X^d-1$, l'algorithme s'arrête et on a
+    bien un élément normal à la fin. Les modifications qu'on fait à $\theta$
+    sont liées à de l'algèbre linéaire : on doit résoudre des systèmes
+  linéaires.}
+
+\end{frame}
+
+\section{\scshape Résultats}
+\begin{frame}{Résultats}
+  \begin{itemize}
+    \item L'algorithme randomisé semble avoir une complexité indentique à la
+      complexité théorique, les calculs avec $d\approx2^{10}$ et $p\approx
+      2^{21}$ (complexité en $2^{35}$) sont faits en une minute.
+    \item De manière surprenante l'algorithme randomisé naïf va aussi vite que
+      l'algorithme élaboré, après étude : les algorithmes naïf et élaboré semblent trouver des
+      éléments normaux du premier coup, ce qui est étrange.
+    \item L'algorithme de Lüneburg est assez lent (mal codé).
+    \item L'algorithme de Lenstra est plus rapide que celui de Lüneburg.
+  \end{itemize}
+\end{frame}
+
+\end{document}

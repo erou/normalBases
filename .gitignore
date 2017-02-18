@@ -11,3 +11,6 @@ bench
 *.swp
 *.log
 *.bbl
+*.nav
+*.snm
+*.backup
