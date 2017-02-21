@@ -770,6 +770,58 @@ polynomials. The implementation is a translation of the steps we followed
 to obtain $\beta$.
 
 \section{Experimental results}
+In the source code, one can find two directories named \texttt{fq} and
+\texttt{fq\_nmod} with very little differences between the files inside these
+directories. The name of the file determines the type used in the functions. The
+type \texttt{fq} supports arbitrary large integers $p$ for the characteristic of
+the fields $\mathbb{F}_{p^d}$, whereas \texttt{fq\_nmod} supports only small
+integers for $p$ but is faster.
+
+\subsection{Random algorithms}
+We implemented the naive algorithm for computing normal elements, in order to
+compare this algorithm to the more elaborate one. Surprinsigly, as we see in
+Figure~\ref{NaiveElab}, the speed is
+often the same, because when we chose an element randomly in
+$\mathbb{F}_{p^d}$, it is often a normal element. If the naive algorithm finds a
+normal element with its first pick, there is no way that the the elaborate one is
+faster, since it does more calculus. There are still a few cases where the naive
+algorithm does not find a normal element easily, and where the elaborate one is
+faster.
+
+The time spent in those algorithms is essentially to time spent to perform the
+tests. 
+
+\begin{figure}
+  \begin{center}
+\includegraphics[scale=0.6]{../benchmarks/benchNaiveElab.pdf}
+\end{center}
+\caption{Benchmark of naive and elaborate algorithms with $p=90001$.}
+\label{NaiveElab}
+\end{figure}
+
+\subsection{Lüneburg's and Lenstra's algorithms}
+
+Lenstra's algorithm is faster than Lüneburg algorithm, though the complexity
+obtained seems to match with the theory in both algorithms. Also, Lenstra's
+algotihm is mush more stable than Lüneburg's, the latter can have really
+different behaviours for entries of the same sizes. The core of
+both Lüneburg's and Lenstra's algorithms is the computation of the
+$\sigma$-order polynomials.
+
+  \begin{figure}
+\begin{center}
+    \begin{tabular}{ccc}
+      \textbf{d} & \textbf{Lüneburg} & \textbf{Lenstra} \\ 
+     $50$ & $1,87$ s & $0,65$ s \\
+     $114$ & $93,0$ s  & $11,7$ s \\
+     $205$ & $290$ s & $187$ s \\
+     $249$ & $1960$ s & $253$ s 
+    \end{tabular}
+    \caption{Benchmark of Lüneburg's and Lenstra's algorithms with $p=90001$.}
+    \label{LuneburgLenstra}
+\end{center}
+  \end{figure}
+
 
 \clearpage
 \bibliographystyle{unsrt}

@@ -1,4 +1,4 @@
-d    naive    normal_random
+#d    naive    normal_random
 2    5    1    
 3    0    0    
 4    0    0    

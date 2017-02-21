@@ -183,9 +183,9 @@
   On va voir trois algorithmes.
 
   \begin{itemize}
-    \item Algorithme randomisé $O((n+\log q)(n\log q)^2)$
-    \item Algorithme de Lüneburg $O((n^{\alert{2}<2>}+\log q)(n\log q)^2)$
-    \item Algorithme de Lenstra $O((n^{\alert{2}<2>}+\log q)(n\log q)^2)$
+    \item Algorithme randomisé $O((d+\log p)(d\log p)^2)$
+    \item Algorithme de Lüneburg $O((d^{\alert{2}<2>}+\log p)(d\log p)^2)$
+    \item Algorithme de Lenstra $O((d^{\alert{2}<2>}+\log p)(d\log p)^2)$
   \end{itemize}
 
 \end{frame}
@@ -295,7 +295,7 @@
 \end{frame}
 
 \begin{frame}{Algorithme de Lenstra}
-  L'algoithme de Lenstra fonctionne de la façon suivante.
+  L'algorithme de Lenstra fonctionne de la façon suivante.
   \begin{itemize}
     \item On prend un élément $\theta\in\mathbb{F}_{p^d}$ quelconque et on
       calcule $\Ord_\theta$.
@@ -319,7 +319,7 @@
     \item De manière surprenante l'algorithme randomisé naïf va aussi vite que
       l'algorithme élaboré, après étude : les algorithmes naïf et élaboré semblent trouver des
       éléments normaux du premier coup, ce qui est étrange.
-    \item L'algorithme de Lüneburg est assez lent (mal codé).
+    \item L'algorithme de Lüneburg est assez lent.
     \item L'algorithme de Lenstra est plus rapide que celui de Lüneburg.
   \end{itemize}
 \end{frame}
