@@ -34,9 +34,9 @@ void main() {
 
     // We open the file `bench.txt`
     FILE *file;
-    file = fopen("bench.txt", "a");
+    file = fopen("bench2.txt", "a");
 
-    flint_fprintf(file, "d    naive    normal_random    luneburg    lenstra\n"); 
+    flint_fprintf(file, "d    naive    normal_random\n"); 
 
 
     while (d < max) {
@@ -54,22 +54,12 @@ void main() {
         timeit_start(t);
         normal_random(res, field);
         timeit_stop(t);
-        flint_fprintf(file, "%wd    ", t->wall);
-
-        timeit_start(t);
-        luneburg(res, field);
-        timeit_stop(t);
-        flint_fprintf(file, "%wd    ", t->wall);
-
-        timeit_start(t);
-        lenstra(res, field);
-        timeit_stop(t);
-        flint_fprintf(file, "%wd\n", t->wall);
+        flint_fprintf(file, "%wd    \n", t->wall);
 
         fq_nmod_clear(res, field);
         fq_nmod_ctx_clear(field);
 
-        d = d + 1 + d/10;
+        d++;
     }
 
     // We close the file

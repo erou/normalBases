@@ -27,9 +27,8 @@ void sigma_order(fq_nmod_poly_t res, const fq_nmod_t x, const fq_nmod_ctx_t fiel
 		d = fq_nmod_ctx_degree(field);
 
 		// We define matrices
-		fq_nmod_mat_t M, Mcopy;
+		fq_nmod_mat_t M;
 		fq_nmod_mat_init(M, d, d+1, field);
-		fq_nmod_mat_init(Mcopy, d, d+1, field);
 
 		// And we define elements of F_{p^d}
 		fq_nmod_t tmp, xcopy;
@@ -46,10 +45,6 @@ void sigma_order(fq_nmod_poly_t res, const fq_nmod_t x, const fq_nmod_ctx_t fiel
 			fq_nmod_mat_entry_set(M, i, 0, tmp, field);
 		}
 
-		// Mcopy is a copy of M used to compute the rank of M
-		// without changing M
-		fq_nmod_mat_set(Mcopy, M, field);
-
 		/* In order to know the least k and the coefficient, 
 		 * we will use a reduced row echelon form :
 		 * if we have a matrix (C1 C2 C3 C4) with columns Ci that are
@@ -57,10 +52,7 @@ void sigma_order(fq_nmod_poly_t res, const fq_nmod_t x, const fq_nmod_ctx_t fiel
 		 * then the rank will when adding C4 will show if v4 is in the linear
 		 * span of {v1, v2, v3}, and the coefficients are those of the last
 		 * column after performing the reduced row echelon form */
-		while (fq_nmod_mat_rref(Mcopy, field) == k) {
-
-			// We copy M into Mcopy
-			fq_nmod_mat_set(Mcopy, M, field);
+		while (fq_nmod_mat_rank(M, field) == k) {
 
 			// We compute σ^k(x)
 			fq_nmod_frobenius(xcopy, xcopy, 1, field);
@@ -72,11 +64,11 @@ void sigma_order(fq_nmod_poly_t res, const fq_nmod_t x, const fq_nmod_ctx_t fiel
 				fq_nmod_mat_entry_set(M, i, k, tmp, field);
 			}
 
-			// We copy the new M in Mcopy to compute its rank
-			fq_nmod_mat_set(Mcopy, M, field);
-
 			k++;
 		}
+
+        // We compute the reduced rox echelon form of M
+        fq_nmod_mat_rref(M, field);
 
 		// We define P and allocate memory for enough coefficients
 		fq_nmod_poly_t P;
@@ -84,7 +76,7 @@ void sigma_order(fq_nmod_poly_t res, const fq_nmod_t x, const fq_nmod_ctx_t fiel
 
 		// We set the coefficients of P to the c_i's
 		for (i = 0; i < k-1; i++) {
-			fq_nmod_poly_set_coeff(P, i, fq_nmod_mat_entry(Mcopy,i,k-1), field);
+			fq_nmod_poly_set_coeff(P, i, fq_nmod_mat_entry(M,i,k-1), field);
 		}
 
 		// We set P to X^k - \sum c_i X^i
@@ -100,6 +92,5 @@ void sigma_order(fq_nmod_poly_t res, const fq_nmod_t x, const fq_nmod_ctx_t fiel
 		fq_nmod_clear(xcopy, field);
 		fq_nmod_poly_clear(P, field);
 		fq_nmod_mat_clear(M, field);
-		fq_nmod_mat_clear(Mcopy, field);
 	}
 }
