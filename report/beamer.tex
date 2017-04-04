@@ -16,7 +16,7 @@
 \usepackage{amsmath,amssymb,amsthm,amsopn}
 \usepackage{mathrsfs}
 \usepackage{graphicx}
-%\usepackage{tikz}
+\usepackage{tikz}
 %\usepackage{array}
 %\usepackage[top=1cm,bottom=1cm]{geometry}
 %\usepackage{listings}
@@ -110,7 +110,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\title{Génaration d'éléments normaux en C}
+\title{Génération d'éléments normaux en C}
 %\subtitle{SUBTITLE}
 % \author{
 % 	Édouard Rousseau\\
@@ -168,6 +168,15 @@
   Ce type de base est appelé \emph{base normale}.
 \end{frame}
 
+\begin{frame}{Éléments normaux : à quoi ça sert ?}
+  \begin{itemize}
+    \item \emph{En pratique}, les bases normales rendent l'arithmétique (additions,
+      multiplications, etc) moins coûteuses en énergie. Applications en
+      cryptographie, théorie des codes.
+    \item \emph{En théorie}, elles sont utiles pour comprendre des problèmes
+      d'algèbre liés aux extensions de corps.
+  \end{itemize}
+\end{frame}
 \begin{frame}{Existence d'éléments normaux}
   \begin{thm}
     Soit $\mathbb{F}_{p^d}/\mathbb{F}_p$ une extension de corps finie. Il existe
@@ -313,15 +322,25 @@
 \section{\scshape Résultats}
 \begin{frame}{Résultats}
   \begin{itemize}
-    \item L'algorithme randomisé semble avoir une complexité indentique à la
-      complexité théorique, les calculs avec $d\approx2^{10}$ et $p\approx
-      2^{21}$ (complexité en $2^{35}$) sont faits en une minute.
+    \item Les complexités en pratique et théoriques semblent en adéquation.
     \item De manière surprenante l'algorithme randomisé naïf va aussi vite que
       l'algorithme élaboré, après étude : les algorithmes naïf et élaboré semblent trouver des
-      éléments normaux du premier coup, ce qui est étrange.
-    \item L'algorithme de Lüneburg est assez lent.
-    \item L'algorithme de Lenstra est plus rapide que celui de Lüneburg.
+      éléments normaux du premier coup.
+    \item L'algorithme de Lenstra est plus rapide et plus stable que celui de Lüneburg.
+    \item L'algorithme de Lüneburg est un peu chaotique : temps de calculs
+      parfois étonnamment longs, ou courts.
   \end{itemize}
 \end{frame}
+
+{ % all template changes are local to this group.
+    \setbeamertemplate{navigation symbols}{}
+    \begin{frame}[plain]
+        \begin{tikzpicture}[remember picture,overlay]
+            \node[at=(current page.center)] {
+                \includegraphics[height=\paperwidth]{theEnd.jpg}
+            };
+        \end{tikzpicture}
+     \end{frame}
+}
 
 \end{document}

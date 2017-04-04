@@ -3,6 +3,7 @@ main
 test
 bench
 
+*.jpg
 *.out
 *.blg
 *.toc

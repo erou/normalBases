@@ -6,7 +6,7 @@
  * The sigma order of x is a polynomial X^k - \sum_{i=0}^{k-1} c_i X^i
  * where k is the least positive integer such that σ^k(x) belongs
  * to the F_p linear span of {σ^0(x), σ^1(x), ... , σ^{k-1}(x)}, σ is the
- * frobenius homomorphism, and the c_i's are the coefficient such that
+ * frobenius homomorphism, and the c_i's are the coefficients such that
  * σ^k(x) = \sum c_i σ^i(x).
  *
  * References ::
@@ -45,7 +45,7 @@ void sigma_order(fq_poly_t res, const fq_t x, const fq_ctx_t field) {
 			fq_mat_entry_set(M, i, 0, tmp, field);
 		}
 
-		/* In order to know the least k and the coefficient, 
+		/* In order to know the least k and the coefficients, 
 		 * we will use a reduced row echelon form :
 		 * if we have a matrix (C1 C2 C3 C4) with columns Ci that are
 		 * coefficients of vi, and (C1 C2 C3) of rank 3,
@@ -67,7 +67,7 @@ void sigma_order(fq_poly_t res, const fq_t x, const fq_ctx_t field) {
 			k++;
 		}
 
-        // We compute the reduced rox echelon form of M
+        // We compute the reduced row echelon form of M
         fq_mat_rref(M, field);
 
 		// We define P and allocate memory for enough coefficients
